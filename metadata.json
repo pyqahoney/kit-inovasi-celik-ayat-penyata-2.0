@@ -1,0 +1,9 @@
+{
+  "name": "Celik Perintah AR - Pembelajaran Bahasa Melayu Trialogikal",
+  "description": "Aplikasi mudah alih interaktif PdP Bahasa Melayu topik Ayat Perintah berteraskan Model Pembelajaran Trialogikal dengan Augmented Reality (AR), Gamifikasi, dan Papan Pemuka PBS TP1-TP6 untuk murid sekolah rendah.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
