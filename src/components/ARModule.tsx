@@ -10,6 +10,7 @@ import { TEACHER_PROFILES, TeacherId } from './TeacherCharacters';
 
 interface ARModuleProps {
   onBack: () => void;
+  onHome?: () => void;
   onSessionComplete: (cardId: string) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
@@ -18,6 +19,7 @@ interface ARModuleProps {
 
 export const ARModule: React.FC<ARModuleProps> = ({
   onBack,
+  onHome,
   onSessionComplete,
   soundEnabled,
   onToggleSound,
@@ -97,7 +99,7 @@ export const ARModule: React.FC<ARModuleProps> = ({
       {/* Top Navbar */}
       <TopNavBar
         onExit={onBack}
-        onHome={onBack}
+        onHome={onHome || onBack}
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
         title="Augmented Reality (AR) Interaktif"

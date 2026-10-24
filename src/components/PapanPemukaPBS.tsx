@@ -8,6 +8,7 @@ import { sound } from '../utils/audio';
 interface PapanPemukaPBSProps {
   students: StudentPBSRecord[];
   onBack: () => void;
+  onHome?: () => void;
   onUpdateStudents: (updated: StudentPBSRecord[]) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
@@ -18,6 +19,7 @@ interface PapanPemukaPBSProps {
 export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
   students,
   onBack,
+  onHome,
   onUpdateStudents,
   soundEnabled,
   onToggleSound,
@@ -133,7 +135,7 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
       {/* Top Navbar */}
       <TopNavBar
         onExit={onBack}
-        onHome={onBack}
+        onHome={onHome || onBack}
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
         title="Papan Pemuka Penjejakan PBS (KSSR)"

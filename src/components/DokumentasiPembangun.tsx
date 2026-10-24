@@ -5,12 +5,14 @@ import { sound } from '../utils/audio';
 
 interface DokumentasiPembangunProps {
   onBack: () => void;
+  onHome?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
 }
 
 export const DokumentasiPembangun: React.FC<DokumentasiPembangunProps> = ({
   onBack,
+  onHome,
   soundEnabled,
   onToggleSound
 }) => {
@@ -368,7 +370,7 @@ class _ARPerintahScreenState extends State<ARPerintahScreen> {
       {/* Top Navbar */}
       <TopNavBar
         onExit={onBack}
-        onHome={onBack}
+        onHome={onHome || onBack}
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
         title="Dokumentasi Pembangun & Arkitektur PdP"

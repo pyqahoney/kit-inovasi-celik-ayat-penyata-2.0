@@ -211,6 +211,9 @@ export default function App() {
       sound.playModuleBGM('treasure');
     } else if (currentScreen === 'game_pacman') {
       sound.playModuleBGM('pacman');
+    } else if (currentScreen === 'quiz_menu') {
+      // Halaman kuiz dan permainan dikecualikan daripada lagu latar relaxing nintendo
+      sound.stopBGM();
     } else {
       // Loop the Nintendo Cafe background song on all other screens
       sound.playModuleBGM('default');
@@ -967,7 +970,7 @@ export default function App() {
               onHome={() => setCurrentScreen('home')}
               soundEnabled={soundEnabled}
               onToggleSound={handleToggleSound}
-              title="Panduan Navigasi"
+              title=""
             />
 
             {/* Pop-up 3D Tajuk Panduan Navigasi */}
@@ -1124,8 +1127,19 @@ export default function App() {
               soundEnabled={soundEnabled}
               onToggleSound={handleToggleSound}
               onHelp={() => setCurrentScreen('symbols')}
-              title="Halaman Utama"
+              title=""
             />
+
+            {/* Pop-up 3D Tajuk Halaman Utama */}
+            <div className="flex justify-center mt-1 mb-2 z-20">
+              <div className="relative px-8 py-2.5 rounded-3xl bg-gradient-to-b from-[#a15c38] via-[#8b4513] to-[#582f0e] border-4 border-[#3d1a04] shadow-[0_6px_0_#2b1202,0_10px_20px_rgba(0,0,0,0.35)] text-center transform hover:scale-102 transition-transform">
+                <h1 className="text-2xl sm:text-3xl font-heading font-black text-white tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] flex items-center gap-2 justify-center">
+                  <span>🏠</span>
+                  <span>Halaman Utama</span>
+                  <span>✨</span>
+                </h1>
+              </div>
+            </div>
 
             <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 my-2 z-10">
               {/* Left Side: Animated Teacher Standee with Speech Bubble & Teacher Switcher */}
@@ -1254,8 +1268,19 @@ export default function App() {
               soundEnabled={soundEnabled}
               onToggleSound={handleToggleSound}
               onHelp={() => setCurrentScreen('symbols')}
-              title="Pengenalan"
+              title=""
             />
+
+            {/* Pop-up 3D Tajuk Pengenalan */}
+            <div className="flex justify-center mt-1 mb-2 z-20">
+              <div className="relative px-8 py-2.5 rounded-3xl bg-gradient-to-b from-[#a15c38] via-[#8b4513] to-[#582f0e] border-4 border-[#3d1a04] shadow-[0_6px_0_#2b1202,0_10px_20px_rgba(0,0,0,0.35)] text-center transform hover:scale-102 transition-transform">
+                <h1 className="text-2xl sm:text-3xl font-heading font-black text-white tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)] flex items-center gap-2 justify-center">
+                  <span>💡</span>
+                  <span>Pengenalan: Celik Ayat Perintah</span>
+                  <span>✨</span>
+                </h1>
+              </div>
+            </div>
 
             <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 my-2">
               {/* Left Column: Animated Teacher Standee */}
@@ -1387,7 +1412,7 @@ export default function App() {
               soundEnabled={soundEnabled}
               onToggleSound={handleToggleSound}
               onHelp={() => setCurrentScreen('symbols')}
-              title="Jom Belajar!"
+              title=""
             />
 
             <div className="flex-1 flex flex-col md:flex-row items-center justify-between gap-6 my-4 z-10">
@@ -1495,7 +1520,14 @@ export default function App() {
             SCREEN 24: KUIZ MENU (Storyboard Page 24)
            ======================================================== */}
         {currentScreen === 'quiz_menu' && (
-          <div className="relative min-h-[580px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-200 flex flex-col justify-between p-4 sm:p-6 animate-fade-in">
+          <div
+            className="relative min-h-[580px] rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl flex flex-col justify-between p-4 sm:p-6 animate-fade-in"
+            style={{
+              backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.5)), url('/assets/aistudio/halaman_kuiz_dan_permainan_bg.svg')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
             {/* Flying Blue Bird in sky */}
             <div className="absolute top-6 right-16 z-10">
               <BlueBirdVector size={48} />
@@ -1545,27 +1577,34 @@ export default function App() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl w-full">
-                {/* Game 1 Card: Lompat Si Katak Lompat matching Page 24 */}
+                {/* Game 1 Card: Lompat Si Katak */}
                 <div
                   onClick={() => {
                     sound.playClick();
                     setCurrentScreen('game_frog');
                   }}
-                  className="p-4 rounded-3xl bg-gradient-to-b from-emerald-50 to-emerald-100 border-4 border-emerald-500 shadow-xl cursor-pointer hover:scale-103 transition-all text-center flex flex-col items-center justify-between"
+                  className="p-4 rounded-3xl bg-white/95 backdrop-blur-xs border-4 border-emerald-500 shadow-xl cursor-pointer hover:scale-103 transition-all text-center flex flex-col items-center justify-between"
                 >
-                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-600 text-white uppercase tracking-wider mb-1">
+                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-600 text-white uppercase tracking-wider mb-2">
                     Permainan 1
                   </span>
-                  <FrogVector pose="happy" size={90} />
-                  <div className="mt-1">
+                  <div className="my-1">
+                    <KatakLompatLogo size={84} />
+                  </div>
+                  <div className="mt-2 w-full">
                     <h3 className="font-heading font-black text-lg text-emerald-950">
                       Lompat Si Katak
                     </h3>
-                    <p className="text-[11px] text-emerald-800 font-semibold mt-0.5">
-                      5 Soalan · Menyeberang sungai dengan memilih teratai jawapan!
-                    </p>
+                    <div className="mt-2 space-y-1 text-xs">
+                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-bold border border-emerald-300">
+                        Aras Kesukaran: <span className="font-black text-emerald-700">Mudah</span>
+                      </div>
+                      <div className="text-[11px] font-bold text-slate-700">
+                        Bilangan Soalan: <span className="font-black text-emerald-800">5 Soalan</span>
+                      </div>
+                    </div>
                   </div>
-                  <button className="mt-2 px-4 py-1.5 rounded-2xl bg-emerald-600 text-white font-heading font-bold text-xs shadow">
+                  <button className="mt-3 px-4 py-1.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-heading font-bold text-xs shadow transition-all">
                     Main Sekarang 🐸
                   </button>
                 </div>
@@ -1576,51 +1615,60 @@ export default function App() {
                     sound.playClick();
                     setCurrentScreen('game_treasure');
                   }}
-                  className="p-4 rounded-3xl bg-gradient-to-b from-amber-50 to-amber-100 border-4 border-amber-500 shadow-xl cursor-pointer hover:scale-103 transition-all text-center flex flex-col items-center justify-between"
+                  className="p-4 rounded-3xl bg-white/95 backdrop-blur-xs border-4 border-amber-500 shadow-xl cursor-pointer hover:scale-103 transition-all text-center flex flex-col items-center justify-between"
                 >
-                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-600 text-white uppercase tracking-wider mb-1">
-                    Permainan 2 🪙
+                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-600 text-white uppercase tracking-wider mb-2">
+                    Permainan 2
                   </span>
-                  <TreasureChestVector isOpen={true} size={95} />
-                  <div className="mt-1">
-                    <h3 className="font-heading font-black text-lg text-amber-950">
-                      Game Kembara Harta Karun
-                    </h3>
-                    <p className="text-[11px] text-amber-800 font-semibold mt-0.5">
-                      7 Soalan · Masukkan syiling emas yang tepat ke peti lanun!
-                    </p>
+                  <div className="my-1">
+                    <KembaraHartaKarunLogo size={84} />
                   </div>
-                  <button className="mt-2 px-4 py-1.5 rounded-2xl bg-amber-600 text-white font-heading font-bold text-xs shadow">
+                  <div className="mt-2 w-full">
+                    <h3 className="font-heading font-black text-lg text-amber-950">
+                      Kembara Harta Karun
+                    </h3>
+                    <div className="mt-2 space-y-1 text-xs">
+                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold border border-amber-300">
+                        Aras Kesukaran: <span className="font-black text-amber-700">Sederhana</span>
+                      </div>
+                      <div className="text-[11px] font-bold text-slate-700">
+                        Bilangan Soalan: <span className="font-black text-amber-800">7 Soalan</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button className="mt-3 px-4 py-1.5 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-heading font-bold text-xs shadow transition-all">
                     Kembara Harta Karun 🪙
                   </button>
                 </div>
 
-                {/* Game 3 Card: Wira Mario Ayat Perintah */}
+                {/* Game 3 Card: Wira Mario */}
                 <div
                   onClick={() => {
                     sound.playClick();
                     setCurrentScreen('game_mario');
                   }}
-                  className="p-4 rounded-3xl bg-gradient-to-b from-sky-50 to-rose-100 border-4 border-rose-500 shadow-xl cursor-pointer hover:scale-103 transition-all text-center flex flex-col items-center justify-between"
+                  className="p-4 rounded-3xl bg-white/95 backdrop-blur-xs border-4 border-rose-500 shadow-xl cursor-pointer hover:scale-103 transition-all text-center flex flex-col items-center justify-between"
                 >
-                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-rose-600 text-white uppercase tracking-wider mb-1">
-                    Permainan 3 🍄
+                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-rose-600 text-white uppercase tracking-wider mb-2">
+                    Permainan 3
                   </span>
-                  <div className="w-20 h-20 rounded-2xl bg-[#5c94fc] border-3 border-amber-400 flex flex-col items-center justify-center shadow-inner relative overflow-hidden my-1">
-                    <span className="text-3xl animate-bounce">🍄</span>
-                    <span className="text-[9px] font-heading font-black text-white bg-black/60 px-1.5 py-0.5 rounded-full mt-0.5">
-                      Wira Mario
-                    </span>
+                  <div className="my-1">
+                    <WiraMarioLogo size={84} />
                   </div>
-                  <div className="mt-1">
+                  <div className="mt-2 w-full">
                     <h3 className="font-heading font-black text-lg text-slate-900">
                       Wira Mario
                     </h3>
-                    <p className="text-[11px] text-rose-950 font-semibold mt-0.5">
-                      5 Blok Misteri · Berlari & melompat menewaskan cabaran!
-                    </p>
+                    <div className="mt-2 space-y-1 text-xs">
+                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-900 font-bold border border-rose-300">
+                        Aras Kesukaran: <span className="font-black text-rose-700">Mencabar (3 Level)</span>
+                      </div>
+                      <div className="text-[11px] font-bold text-slate-700">
+                        Bilangan Soalan: <span className="font-black text-rose-800">9 Soalan</span>
+                      </div>
+                    </div>
                   </div>
-                  <button className="mt-2 px-4 py-1.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-heading font-bold text-xs shadow">
+                  <button className="mt-3 px-4 py-1.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-heading font-bold text-xs shadow transition-all">
                     Mula Mengembara 🎮
                   </button>
                 </div>
@@ -1631,42 +1679,36 @@ export default function App() {
                     sound.playClick();
                     setCurrentScreen('game_pacman');
                   }}
-                  className="p-4 rounded-3xl bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 border-4 border-yellow-400 shadow-xl cursor-pointer hover:scale-103 transition-all text-center flex flex-col items-center justify-between text-white"
+                  className="p-4 rounded-3xl bg-slate-900/95 backdrop-blur-xs border-4 border-yellow-400 shadow-xl cursor-pointer hover:scale-103 transition-all text-center flex flex-col items-center justify-between text-white"
                 >
-                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-yellow-400 text-slate-950 uppercase tracking-wider mb-1">
-                    Permainan 4 · Baharu! 🟡
+                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-yellow-400 text-slate-950 uppercase tracking-wider mb-2">
+                    Permainan 4
                   </span>
-                  <div className="w-20 h-20 rounded-2xl bg-black border-3 border-blue-500 flex flex-col items-center justify-center shadow-inner relative overflow-hidden my-1">
-                    <div className="flex items-center gap-1">
-                      <span className="text-2xl animate-pulse">🟡</span>
-                      <span className="text-xs">👻</span>
-                    </div>
-                    <span className="text-[9px] font-heading font-black text-yellow-300 bg-blue-950/90 px-1.5 py-0.5 rounded-full mt-1 border border-yellow-500/40">
-                      PAC-MAN
-                    </span>
+                  <div className="my-1">
+                    <KuasaPacmanLogo size={84} />
                   </div>
-                  <div className="mt-1">
+                  <div className="mt-2 w-full">
                     <h3 className="font-heading font-black text-lg text-yellow-400">
                       Game Kuasa Pac-Man
                     </h3>
-                    <p className="text-[11px] text-yellow-200/90 font-semibold mt-0.5">
-                      Labirin Retro · Makan bintang kuasa dan kuasai ayat perintah!
-                    </p>
+                    <div className="mt-2 space-y-1 text-xs">
+                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 font-bold border border-yellow-400/40">
+                        Aras Kesukaran: <span className="font-black text-yellow-300">Sederhana</span>
+                      </div>
+                      <div className="text-[11px] font-bold text-slate-200">
+                        Bilangan Soalan: <span className="font-black text-yellow-400">6 Soalan</span>
+                      </div>
+                    </div>
                   </div>
-                  <button className="mt-2 px-4 py-1.5 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-heading font-black text-xs shadow">
+                  <button className="mt-3 px-4 py-1.5 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-heading font-black text-xs shadow transition-all">
                     Kuasai Pac-Man 🟡
                   </button>
                 </div>
               </div>
-
-              {/* Explorer boy standing in center */}
-              <div className="mt-6">
-                <BoyVector pose="wave" size={110} />
-              </div>
             </div>
 
             {/* Foreground Foliage */}
-            <div className="absolute bottom-0 left-0 right-0 z-0">
+            <div className="absolute bottom-0 left-0 right-0 z-0 pointer-events-none">
               <FoliageForeground />
             </div>
 

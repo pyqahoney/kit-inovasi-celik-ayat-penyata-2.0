@@ -238,7 +238,7 @@ export const BoyVector: React.FC<{
 
 // Si Katak Comel Hijau (Green Jumping Frog Vector)
 export const FrogVector: React.FC<{
-  pose?: 'normal' | 'happy' | 'peace' | 'jump';
+  pose?: 'normal' | 'happy' | 'peace' | 'jump' | 'sad' | 'jumping_joy';
   size?: number;
   className?: string;
   onClick?: () => void;
@@ -255,26 +255,50 @@ export const FrogVector: React.FC<{
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full drop-shadow-md"
       >
+        {/* Sparkles if jumping for joy */}
+        {pose === 'jumping_joy' && (
+          <g className="animate-pulse">
+            <polygon points="35,30 38,20 41,30 50,33 41,36 38,45 35,36 25,33" fill="#facc15" />
+            <polygon points="165,30 168,20 171,30 180,33 171,36 168,45 165,36 155,33" fill="#facc15" />
+            <polygon points="100,10 102,4 104,10 110,12 104,14 102,20 100,14 94,12" fill="#38bdf8" />
+          </g>
+        )}
+
         {/* Big Frog Body */}
-        <ellipse cx="100" cy="115" rx="55" ry="45" fill="#65a30d" />
+        <ellipse cx="100" cy="115" rx="55" ry="45" fill={pose === 'sad' ? '#4d7c0f' : '#65a30d'} />
         {/* Soft yellow-green belly */}
-        <ellipse cx="100" cy="122" rx="38" ry="30" fill="#d9f99d" />
+        <ellipse cx="100" cy="122" rx="38" ry="30" fill={pose === 'sad' ? '#bef264' : '#d9f99d'} />
 
         {/* Big Round Bulging Frog Eyes Top */}
-        <circle cx="68" cy="55" r="26" fill="#65a30d" />
-        <circle cx="132" cy="55" r="26" fill="#65a30d" />
+        <circle cx="68" cy="55" r="26" fill={pose === 'sad' ? '#4d7c0f' : '#65a30d'} />
+        <circle cx="132" cy="55" r="26" fill={pose === 'sad' ? '#4d7c0f' : '#65a30d'} />
 
         {/* Eye Whites */}
         <circle cx="68" cy="55" r="18" fill="#ffffff" />
         <circle cx="132" cy="55" r="18" fill="#ffffff" />
 
-        {/* Pupil */}
-        {pose === 'peace' ? (
-          // Winking left eye & open right eye
+        {/* Pupil & Eyebrows */}
+        {pose === 'sad' ? (
+          // Drooping sad tearful eyes
           <>
-            <path d="M56 55 Q68 45 80 55" stroke="#14532d" strokeWidth="4" strokeLinecap="round" fill="none" />
-            <circle cx="132" cy="55" r="11" fill="#14532d" />
-            <circle cx="135" cy="52" r="4" fill="#ffffff" />
+            {/* Sad downturned eyebrows */}
+            <path d="M52 40 Q68 48 84 44" stroke="#14532d" strokeWidth="4" strokeLinecap="round" />
+            <path d="M116 44 Q132 48 148 40" stroke="#14532d" strokeWidth="4" strokeLinecap="round" />
+            <ellipse cx="68" cy="60" rx="9" ry="8" fill="#14532d" />
+            <ellipse cx="132" cy="60" rx="9" ry="8" fill="#14532d" />
+            <circle cx="71" cy="58" r="3" fill="#ffffff" />
+            <circle cx="135" cy="58" r="3" fill="#ffffff" />
+            {/* Big Water Tears */}
+            <ellipse cx="56" cy="74" rx="4" ry="6" fill="#38bdf8" opacity="0.9" />
+            <ellipse cx="144" cy="74" rx="4" ry="6" fill="#38bdf8" opacity="0.9" />
+            <path d="M56 68 Q54 75 56 80 Q58 75 56 68 Z" fill="#0284c7" />
+            <path d="M144 68 Q142 75 144 80 Q146 75 144 68 Z" fill="#0284c7" />
+          </>
+        ) : pose === 'peace' || pose === 'jumping_joy' ? (
+          // Squeezed shut happy eyes (^ ^)
+          <>
+            <path d="M54 58 Q68 38 82 58" stroke="#14532d" strokeWidth="5" strokeLinecap="round" fill="none" />
+            <path d="M118 58 Q132 38 146 58" stroke="#14532d" strokeWidth="5" strokeLinecap="round" fill="none" />
           </>
         ) : (
           <>
@@ -285,28 +309,56 @@ export const FrogVector: React.FC<{
           </>
         )}
 
-        {/* Cheerful Mouth */}
-        {pose === 'happy' ? (
-          <path d="M65 92 Q100 135 135 92 Z" fill="#ef4444" stroke="#14532d" strokeWidth="3" />
+        {/* Mouth */}
+        {pose === 'sad' ? (
+          // Sad downturned trembling mouth
+          <path d="M72 110 Q100 88 128 110" stroke="#14532d" strokeWidth="4" strokeLinecap="round" fill="none" />
+        ) : pose === 'happy' || pose === 'jumping_joy' ? (
+          // Giant joyous open laughing mouth
+          <g>
+            <path d="M60 92 Q100 142 140 92 Z" fill="#ef4444" stroke="#14532d" strokeWidth="3" />
+            <ellipse cx="100" cy="116" rx="20" ry="10" fill="#f87171" />
+          </g>
         ) : (
           <path d="M65 95 Q100 120 135 95" stroke="#14532d" strokeWidth="4" strokeLinecap="round" fill="none" />
         )}
 
         {/* Rosy Cheeks */}
-        <circle cx="56" cy="100" r="7" fill="#f87171" opacity="0.7" />
-        <circle cx="144" cy="100" r="7" fill="#f87171" opacity="0.7" />
+        <circle cx="56" cy="100" r={pose === 'sad' ? 5 : 8} fill={pose === 'sad' ? '#93c5fd' : '#f87171'} opacity="0.7" />
+        <circle cx="144" cy="100" r={pose === 'sad' ? 5 : 8} fill={pose === 'sad' ? '#93c5fd' : '#f87171'} opacity="0.7" />
 
         {/* Front webbed hands */}
         <g>
-          {pose === 'peace' ? (
+          {pose === 'jumping_joy' ? (
+            // Both hands thrown high in air celebrating
+            <>
+              <path d="M65 90 Q40 60 30 45" stroke="#4d7c0f" strokeWidth="8" strokeLinecap="round" />
+              <ellipse cx="28" cy="42" rx="7" ry="5" fill="#4d7c0f" />
+              <ellipse cx="22" cy="46" rx="5" ry="4" fill="#4d7c0f" />
+              <ellipse cx="32" cy="48" rx="5" ry="4" fill="#4d7c0f" />
+
+              <path d="M135 90 Q160 60 170 45" stroke="#4d7c0f" strokeWidth="8" strokeLinecap="round" />
+              <ellipse cx="172" cy="42" rx="7" ry="5" fill="#4d7c0f" />
+              <ellipse cx="178" cy="46" rx="5" ry="4" fill="#4d7c0f" />
+              <ellipse cx="168" cy="48" rx="5" ry="4" fill="#4d7c0f" />
+            </>
+          ) : pose === 'peace' ? (
             // Peace hand on the right
             <g transform="translate(138, 85)">
               <path d="M0 25 L8 5 L14 18 L24 8 L22 30 Z" fill="#4d7c0f" />
             </g>
+          ) : pose === 'sad' ? (
+            // Drooping sad limp hands
+            <>
+              <path d="M65 125 C50 145 42 165 48 172" stroke="#365314" strokeWidth="6" strokeLinecap="round" />
+              <path d="M135 125 C150 145 158 165 152 172" stroke="#365314" strokeWidth="6" strokeLinecap="round" />
+            </>
           ) : (
-            <path d="M135 125 C145 135 155 145 150 155 C145 160 135 155 130 145 Z" fill="#4d7c0f" />
+            <>
+              <path d="M135 125 C145 135 155 145 150 155 C145 160 135 155 130 145 Z" fill="#4d7c0f" />
+              <path d="M65 125 C55 135 45 145 50 155 C55 160 65 155 70 145 Z" fill="#4d7c0f" />
+            </>
           )}
-          <path d="M65 125 C55 135 45 145 50 155 C55 160 65 155 70 145 Z" fill="#4d7c0f" />
         </g>
 
         {/* Back Frog webbed feet */}

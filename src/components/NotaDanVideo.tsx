@@ -9,6 +9,7 @@ import { TeaterDramaVideo } from './TeaterDramaVideo';
 interface NotaDanVideoProps {
   initialSubTab?: 'nota' | 'video' | 'teater';
   onBack: () => void;
+  onHome?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
 }
@@ -16,6 +17,7 @@ interface NotaDanVideoProps {
 export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
   initialSubTab = 'nota',
   onBack,
+  onHome,
   soundEnabled,
   onToggleSound
 }) => {
@@ -52,7 +54,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
       {/* Top Navbar */}
       <TopNavBar
         onExit={onBack}
-        onHome={onBack}
+        onHome={onHome || onBack}
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
         title={

@@ -8,6 +8,7 @@ import { sound } from '../utils/audio';
 
 interface FrogGameProps {
   onBack: () => void;
+  onHome?: () => void;
   onComplete: (score: number, coins: number) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
@@ -202,9 +203,9 @@ export const FrogGame: React.FC<FrogGameProps> = ({
     if (answerState !== 'idle') return;
 
     setSelectedLeaf(key);
-    sound.playClick();
+    sound.playFrogHop();
 
-    // Animate frog jump
+    // Animate frog jump towards selected lily pad
     setFrogPosition(key as 'A' | 'B' | 'C');
 
     const isCorrect = key === curQ.correctOptionKey;
@@ -224,15 +225,16 @@ export const FrogGame: React.FC<FrogGameProps> = ({
         } catch {
           // ignore
         }
-      }, 500);
+      }, 450);
     } else {
       setTimeout(() => {
+        sound.playWaterSplash();
         sound.playWrong();
         setAnswerState('wrong');
         setFrogPosition('splash');
         setFlashRed(true);
-        setTimeout(() => setFlashRed(false), 1000);
-      }, 500);
+        setTimeout(() => setFlashRed(false), 1200);
+      }, 450);
     }
   };
 
@@ -398,7 +400,8 @@ export const FrogGame: React.FC<FrogGameProps> = ({
         }}
         onHome={() => {
           stopARCamera();
-          onBack();
+          if (onHome) onHome();
+          else onBack();
         }}
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
@@ -862,10 +865,15 @@ export const FrogGame: React.FC<FrogGameProps> = ({
 
                       {frogPosition === 'B' && (
                         <div
-                          className="absolute -top-12 left-1/2 -translate-x-1/2 animate-bounce"
+                          className={`absolute -top-14 left-1/2 -translate-x-1/2 ${answerState === 'correct' ? 'animate-bounce' : ''}`}
                           style={{ transform: `rotateY(${arRotation}deg)` }}
                         >
-                          <FrogVector pose={answerState === 'correct' ? 'peace' : 'normal'} size={70} />
+                          <FrogVector pose={answerState === 'correct' ? 'jumping_joy' : 'normal'} size={answerState === 'correct' ? 82 : 72} />
+                          {answerState === 'correct' && (
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-emerald-600 text-yellow-200 text-[10px] font-black shadow border border-yellow-300 animate-pulse">
+                              ✨ Berjaya Melompat!
+                            </div>
+                          )}
                         </div>
                       )}
                     </button>
@@ -914,10 +922,15 @@ export const FrogGame: React.FC<FrogGameProps> = ({
 
                       {frogPosition === 'A' && (
                         <div
-                          className="absolute -top-12 left-1/2 -translate-x-1/2 animate-bounce"
+                          className={`absolute -top-14 left-1/2 -translate-x-1/2 ${answerState === 'correct' ? 'animate-bounce' : ''}`}
                           style={{ transform: `rotateY(${arRotation}deg)` }}
                         >
-                          <FrogVector pose={answerState === 'correct' ? 'peace' : 'normal'} size={70} />
+                          <FrogVector pose={answerState === 'correct' ? 'jumping_joy' : 'normal'} size={answerState === 'correct' ? 82 : 72} />
+                          {answerState === 'correct' && (
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-emerald-600 text-yellow-200 text-[10px] font-black shadow border border-yellow-300 animate-pulse">
+                              ✨ Berjaya Melompat!
+                            </div>
+                          )}
                         </div>
                       )}
                     </button>
@@ -966,10 +979,15 @@ export const FrogGame: React.FC<FrogGameProps> = ({
 
                       {frogPosition === 'C' && (
                         <div
-                          className="absolute -top-12 left-1/2 -translate-x-1/2 animate-bounce"
+                          className={`absolute -top-14 left-1/2 -translate-x-1/2 ${answerState === 'correct' ? 'animate-bounce' : ''}`}
                           style={{ transform: `rotateY(${arRotation}deg)` }}
                         >
-                          <FrogVector pose={answerState === 'correct' ? 'peace' : 'normal'} size={70} />
+                          <FrogVector pose={answerState === 'correct' ? 'jumping_joy' : 'normal'} size={answerState === 'correct' ? 82 : 72} />
+                          {answerState === 'correct' && (
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-emerald-600 text-yellow-200 text-[10px] font-black shadow border border-yellow-300 animate-pulse">
+                              ✨ Berjaya Melompat!
+                            </div>
+                          )}
                         </div>
                       )}
                     </button>
@@ -978,13 +996,33 @@ export const FrogGame: React.FC<FrogGameProps> = ({
               );
             })()}
 
-            {/* Water splash animation if wrong */}
+            {/* Water splash animation with ripples & sad frog face if wrong */}
             {frogPosition === 'splash' && (
-              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce z-30">
-                <span className="text-3xl">💦</span>
-                <span className="text-xs font-bold text-white bg-blue-900/90 px-2.5 py-1 rounded-full border border-blue-400 shadow">
-                  {arMode ? 'Si Katak terjun ke meja! Berenang semula...' : 'Katak berenang balik ke tebing!'}
-                </span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center z-30 pointer-events-none">
+                {/* Expanding water ripple waves in river */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+                  <div className="w-28 sm:w-36 h-14 sm:h-18 rounded-full border-4 border-cyan-300 animate-ping opacity-75" />
+                  <div className="absolute w-44 sm:w-56 h-20 sm:h-26 rounded-full border-3 border-sky-400 animate-ping opacity-50 delay-150" />
+                  <div className="absolute w-60 sm:w-72 h-28 sm:h-34 rounded-full border-2 border-blue-400 animate-ping opacity-30 delay-300" />
+                </div>
+
+                {/* Sad Frog with tear drops in water splash */}
+                <div className="relative flex flex-col items-center animate-bounce z-40">
+                  <div className="text-4xl sm:text-5xl animate-pulse">💦 🌊 💦</div>
+                  <div className="relative -mt-2">
+                    <FrogVector pose="sad" size={105} />
+                  </div>
+                  <div className="mt-2 px-4 py-2 rounded-2xl bg-slate-950/90 text-cyan-200 border-2 border-cyan-400 shadow-2xl text-center backdrop-blur-md max-w-sm">
+                    <p className="text-xs sm:text-sm font-heading font-black text-rose-300 flex items-center justify-center gap-1.5">
+                      <span>😢</span>
+                      <span>Katak terjatuh ke dalam sungai!</span>
+                      <span>💦</span>
+                    </p>
+                    <p className="text-[11px] text-cyan-200 font-semibold mt-0.5">
+                      Muka katak sedih... Tekan "Cuba Semula" untuk selamatkannya ke teratai!
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -1031,8 +1069,8 @@ export const FrogGame: React.FC<FrogGameProps> = ({
               </div>
             </div>
 
-            <div className="shrink-0 transform hover:scale-105 transition-transform">
-              <FrogVector pose="peace" size={170} />
+            <div className="shrink-0 transform hover:scale-105 transition-transform animate-bounce">
+              <FrogVector pose="jumping_joy" size={170} />
             </div>
           </div>
         </div>

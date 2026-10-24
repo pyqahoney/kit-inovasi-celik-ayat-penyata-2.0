@@ -8,6 +8,7 @@ import { sound } from '../utils/audio';
 
 interface TreasureGameProps {
   onBack: () => void;
+  onHome?: () => void;
   onComplete: (score: number, coins: number) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
@@ -256,7 +257,7 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
       {/* Top Navbar */}
       <TopNavBar
         onExit={onBack}
-        onHome={onBack}
+        onHome={onHome || onBack}
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
         title={
@@ -268,61 +269,68 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
         }
       />
 
-      {/* STAGE 1: INTRO (Page 35) */}
+      {/* STAGE 1: INTRO (Pop-Up Tulisan Tajuk & Deskripsi Permainan) */}
       {stage === 'intro' && (
-        <div className="flex-1 flex flex-col items-center justify-center my-4 text-center animate-fade-in z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">🗺️</span>
-            <span className="text-xs font-heading font-black tracking-widest uppercase bg-amber-200 text-amber-900 px-3 py-1 rounded-full">
-              PENGEMBARAAN 7 MISI PULAU AYAT PERINTAH
-            </span>
-          </div>
+        <div className="flex-1 flex flex-col items-center justify-center my-4 text-center animate-fade-in z-10 px-2 sm:px-4">
+          {/* 3D Pop-Up Card Frame */}
+          <div className="relative max-w-2xl w-full p-6 sm:p-10 rounded-3xl bg-gradient-to-b from-[#fffbeb] via-[#fef3c7] to-[#fde68a] border-4 border-[#b45309] shadow-[0_12px_0_#78350f,0_20px_35px_rgba(0,0,0,0.35)] transform hover:scale-[1.01] transition-transform">
+            {/* Pop-Up Header Tag */}
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 border-2 border-amber-300 text-amber-950 font-heading font-black text-xs sm:text-sm tracking-wider uppercase shadow-md animate-bounce">
+              <span>🗺️</span>
+              <span>PENGEMBARAAN 7 MISI PULAU AYAT PERINTAH</span>
+              <span>✨</span>
+            </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black font-heading text-[#78350f] tracking-wider drop-shadow-md uppercase mb-2">
-            GAME KEMBARA HARTA KARUN
-          </h1>
-          <p className="text-amber-800 text-sm sm:text-base font-semibold max-w-md">
-            Jelajahi peta pulau rahsia mengikut misi berperingkat untuk mengumpul semua syiling emas ke dalam peti lanun!
-          </p>
+            {/* 3D Popped-Up Giant Title */}
+            <div className="relative py-2 my-1">
+              <h1 className="text-3xl sm:text-5xl font-black font-heading text-[#78350f] tracking-wider uppercase drop-shadow-[0_4px_6px_rgba(180,83,9,0.4)]">
+                GAME KEMBARA HARTA KARUN
+              </h1>
+            </div>
 
-          <div className="my-5 flex flex-col sm:flex-row items-center justify-center gap-6">
-            <TreasureChestVector isOpen={true} size={170} />
-            <BoyVector pose="pirate" size={160} />
-          </div>
+            {/* 3D Popped-Up Description Box */}
+            <div className="my-4 p-4 sm:p-5 rounded-2xl bg-white/90 border-2 border-amber-400 shadow-inner">
+              <p className="text-amber-950 text-base sm:text-xl font-heading font-bold leading-relaxed">
+                Jelajahi peta pulau rahsia mengikut misi berperingkat untuk mengumpul semua syiling emas ke dalam peti lanun!
+              </p>
+            </div>
 
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                sound.playSuccess();
-                setStage('map');
-              }}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-amber-950 font-heading font-extrabold text-base shadow-[0_5px_0_#92400e] active:translate-y-1 transition-all transform hover:scale-105 flex items-center gap-2"
-            >
-              <Compass size={20} />
-              <span>Buka Peta Misi 🗺️</span>
-            </button>
-            <button
-              onClick={() => {
-                sound.playClick();
-                setStage('instructions');
-              }}
-              className="px-6 py-3 rounded-2xl bg-white hover:bg-amber-100 text-[#78350f] font-heading font-bold text-base border-2 border-amber-400 shadow transition-all"
-            >
-              Arahan Permainan
-            </button>
+            {/* Action Buttons */}
+            <div className="mt-6 flex flex-wrap justify-center gap-3.5">
+              <button
+                onClick={() => {
+                  sound.playSuccess();
+                  setStage('map');
+                }}
+                className="px-8 py-3.5 rounded-2xl bg-gradient-to-b from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-amber-950 font-heading font-black text-lg shadow-[0_6px_0_#92400e] active:translate-y-1 transition-all transform hover:scale-105 flex items-center gap-2 cursor-pointer"
+              >
+                <Compass size={22} className="animate-spin-slow" />
+                <span>Buka Peta Misi 🗺️</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setStage('instructions');
+                }}
+                className="px-6 py-3.5 rounded-2xl bg-white hover:bg-amber-100 text-[#78350f] font-heading font-black text-base border-3 border-amber-400 shadow-[0_4px_0_#d97706] active:translate-y-1 transition-all cursor-pointer"
+              >
+                Arahan Permainan 📜
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* STAGE 2: ARAHAN (Page 36) */}
+      {/* STAGE 2: ARAHAN (Page 36 - Clean without caricatures) */}
       {stage === 'instructions' && (
-        <div className="flex-1 flex flex-col items-center justify-center my-4 animate-fade-in z-10">
-          <div className="relative max-w-xl w-full p-6 sm:p-8 rounded-3xl bg-[#fffbeb] border-4 border-amber-500 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
+        <div className="flex-1 flex flex-col items-center justify-center my-4 animate-fade-in z-10 px-2 sm:px-4">
+          <div className="relative max-w-xl w-full p-6 sm:p-8 rounded-3xl bg-[#fffbeb] border-4 border-amber-500 shadow-[0_10px_0_#92400e,0_16px_28px_rgba(0,0,0,0.3)]">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-amber-300">
               <h2 className="text-2xl sm:text-3xl font-heading font-black text-[#78350f] tracking-wide">
-                ARAHAN
+                ARAHAN PERMAINAN
               </h2>
-              <div className="flex -space-x-3">
+              <div className="flex -space-x-2">
                 <span className="text-3xl">🪙</span>
                 <span className="text-3xl">🪙</span>
               </div>
@@ -330,29 +338,34 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
 
             <div className="space-y-4 text-base sm:text-lg font-medium text-slate-800">
               <div className="flex items-start gap-3">
-                <span className="w-7 h-7 rounded-full bg-amber-500 text-amber-950 flex items-center justify-center font-bold text-sm shrink-0">1</span>
-                <p>Jelajahi peta pulau dari Misi 1 hingga Misi 7 untuk membuka peti rahsia.</p>
+                <span className="w-8 h-8 rounded-full bg-amber-500 text-amber-950 flex items-center justify-center font-bold text-sm shrink-0 shadow">1</span>
+                <p>Jelajahi peta pulau dari <strong>Misi 1 hingga Misi 7</strong> untuk membuka peti rahsia agung.</p>
               </div>
               <div className="flex items-start gap-3">
-                <span className="w-7 h-7 rounded-full bg-amber-500 text-amber-950 flex items-center justify-center font-bold text-sm shrink-0">2</span>
-                <p>Tekan gambar peti harta karun untuk mendengar soalan ayat perintah.</p>
+                <span className="w-8 h-8 rounded-full bg-amber-500 text-amber-950 flex items-center justify-center font-bold text-sm shrink-0 shadow">2</span>
+                <p>Teliti soalan ayat perintah yang dipaparkan pada skrin misi.</p>
               </div>
               <div className="flex items-start gap-3">
-                <span className="w-7 h-7 rounded-full bg-amber-500 text-amber-950 flex items-center justify-center font-bold text-sm shrink-0">3</span>
+                <span className="w-8 h-8 rounded-full bg-amber-500 text-amber-950 flex items-center justify-center font-bold text-sm shrink-0 shadow">3</span>
                 <p>
-                  Tekan syiling jawapan yang betul. Jawapan tepat akan keluar tanda <strong className="text-emerald-600">✓</strong> dan masuk ke dalam peti!
+                  Pilih syiling emas jawapan yang betul. Syiling tepat akan keluar tanda <strong className="text-emerald-600 font-bold">✓</strong> dan masuk ke dalam peti emas!
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 flex justify-between items-center pt-2 border-t border-amber-200">
+            <div className="mt-6 flex justify-between items-center pt-3 border-t border-amber-200">
+              <button
+                onClick={() => setStage('intro')}
+                className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-heading font-bold text-xs shadow"
+              >
+                Kembali
+              </button>
               <button
                 onClick={() => setStage('map')}
-                className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-amber-950 font-heading font-bold text-sm shadow"
+                className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-amber-950 font-heading font-black text-sm shadow-[0_3px_0_#92400e] active:translate-y-0.5"
               >
                 Lihat Peta Pulau 🗺️
               </button>
-              <TreasureChestVector isOpen={false} size={85} />
             </div>
           </div>
         </div>

@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Sky Gradient -->
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="45%" stop-color="#7dd3fc"/>
+      <stop offset="75%" stop-color="#bae6fd"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+
+    <!-- Mountain Gradient -->
+    <linearGradient id="mountainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.6"/>
+    </linearGradient>
+
+    <!-- Mario Green Hill 1 -->
+    <linearGradient id="hillMario1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+
+    <!-- Mario Green Hill 2 -->
+    <linearGradient id="hillMario2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#15803d"/>
+    </linearGradient>
+
+    <!-- Island Sand Gradient -->
+    <linearGradient id="sandGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+
+    <!-- River Water Gradient -->
+    <linearGradient id="riverGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+
+    <!-- Sun Glow -->
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="1"/>
+      <stop offset="50%" stop-color="#facc15" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="1600" height="900" fill="url(#skyGrad)"/>
+
+  <!-- Golden Sun with Glow -->
+  <circle cx="1380" cy="140" r="110" fill="url(#sunGlow)"/>
+  <circle cx="1380" cy="140" r="55" fill="#fde047" stroke="#f59e0b" stroke-width="4"/>
+
+  <!-- Distant Fluffy Clouds -->
+  <g fill="#ffffff" opacity="0.92">
+    <ellipse cx="220" cy="110" rx="90" ry="40"/>
+    <ellipse cx="280" cy="95" rx="70" ry="35"/>
+    <ellipse cx="170" cy="120" rx="60" ry="30"/>
+
+    <ellipse cx="680" cy="160" rx="110" ry="45"/>
+    <ellipse cx="760" cy="145" rx="80" ry="38"/>
+    <ellipse cx="610" cy="170" rx="70" ry="32"/>
+
+    <ellipse cx="1120" cy="90" rx="95" ry="42"/>
+    <ellipse cx="1180" cy="75" rx="75" ry="36"/>
+  </g>
+
+  <!-- Distant Blue Mountains -->
+  <polygon points="120,620 340,380 560,620" fill="url(#mountainGrad)"/>
+  <polygon points="440,620 680,340 920,620" fill="url(#mountainGrad)" opacity="0.7"/>
+  <polygon points="820,620 1060,390 1300,620" fill="url(#mountainGrad)"/>
+
+  <!-- Rolling Lush Green Hills (Mario style) -->
+  <ellipse cx="1350" cy="760" rx="380" ry="240" fill="url(#hillMario1)"/>
+  <ellipse cx="1020" cy="790" rx="340" ry="210" fill="url(#hillMario2)"/>
+  <ellipse cx="240" cy="780" rx="380" ry="220" fill="url(#hillMario1)"/>
+
+  <!-- Mario Hill Details (Bushes and Question Blocks) -->
+  <g fill="#166534">
+    <ellipse cx="1450" cy="620" rx="35" ry="25"/>
+    <ellipse cx="1480" cy="625" rx="28" ry="20"/>
+    <ellipse cx="1180" cy="660" rx="42" ry="28"/>
+    <ellipse cx="150" cy="650" rx="40" ry="26"/>
+  </g>
+
+  <!-- River with Lily pads (Frog Game Motif) -->
+  <path d="M 0,690 C 350,650 550,750 820,700 C 1100,650 1350,710 1600,670 L 1600,900 L 0,900 Z" fill="url(#riverGrad)"/>
+
+  <!-- Water highlights -->
+  <path d="M 220,730 Q 320,715 420,735" stroke="#bae6fd" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <path d="M 680,740 Q 780,725 880,745" stroke="#bae6fd" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <path d="M 1200,725 Q 1300,710 1400,730" stroke="#bae6fd" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <!-- Lily Pads -->
+  <ellipse cx="380" cy="760" rx="45" ry="18" fill="#22c55e" stroke="#15803d" stroke-width="3"/>
+  <path d="M 380,760 L 420,754" stroke="#15803d" stroke-width="3"/>
+  
+  <ellipse cx="780" cy="770" rx="55" ry="22" fill="#22c55e" stroke="#15803d" stroke-width="3"/>
+  <path d="M 780,770 L 830,763" stroke="#15803d" stroke-width="3"/>
+
+  <ellipse cx="1250" cy="755" rx="48" ry="20" fill="#22c55e" stroke="#15803d" stroke-width="3"/>
+
+  <!-- Sandy Beach Coastline (Treasure Island Motif) in foreground -->
+  <path d="M 0,810 C 320,780 620,830 920,800 C 1220,770 1420,810 1600,795 L 1600,900 L 0,900 Z" fill="url(#sandGrad)"/>
+
+  <!-- Retro Pac-Man Dots along a gentle path on the left -->
+  <g opacity="0.75">
+    <circle cx="80" cy="740" r="6" fill="#facc15"/>
+    <circle cx="120" cy="735" r="6" fill="#facc15"/>
+    <circle cx="160" cy="730" r="10" fill="#facc15"/><!-- Power Pellet -->
+    <circle cx="200" cy="728" r="6" fill="#facc15"/>
+  </g>
+
+  <!-- Mario Flagpole on right hill -->
+  <line x1="1480" y1="520" x2="1480" y2="640" stroke="#64748b" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="1480,530 1525,545 1480,560" fill="#22c55e" stroke="#15803d" stroke-width="2"/>
+  <circle cx="1480" cy="516" r="8" fill="#fbbf24"/>
+</svg>

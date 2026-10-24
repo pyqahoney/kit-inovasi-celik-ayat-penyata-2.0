@@ -8,6 +8,7 @@ import { sound } from '../utils/audio';
 
 interface StudioTrialogikalProps {
   onBack: () => void;
+  onHome?: () => void;
   onSaveArtifact: (artifact: TrialogicalArtifact) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
@@ -16,6 +17,7 @@ interface StudioTrialogikalProps {
 
 export const StudioTrialogikal: React.FC<StudioTrialogikalProps> = ({
   onBack,
+  onHome,
   onSaveArtifact,
   soundEnabled,
   onToggleSound,
@@ -74,7 +76,7 @@ export const StudioTrialogikal: React.FC<StudioTrialogikalProps> = ({
       {/* Top Navbar */}
       <TopNavBar
         onExit={onBack}
-        onHome={onBack}
+        onHome={onHome || onBack}
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
         title="Studio Penciptaan Artifak Trialogikal"

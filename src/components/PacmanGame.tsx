@@ -13,6 +13,7 @@ import { TopNavBar, WoodArrowButton } from './OrganicNav';
 
 interface PacmanGameProps {
   onBack: () => void;
+  onHome?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
   onComplete: (score: number, coins: number) => void;
@@ -120,6 +121,7 @@ interface Ghost {
 
 export const PacmanGame: React.FC<PacmanGameProps> = ({
   onBack,
+  onHome,
   soundEnabled,
   onToggleSound,
   onComplete
@@ -437,7 +439,7 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
     <div className="flex-1 flex flex-col justify-between w-full mx-auto select-none touch-none animate-fade-in pb-2">
       {/* Top Bar Navigation */}
       <TopNavBar
-        onHome={onBack}
+        onHome={onHome || onBack}
         onExit={onBack}
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
