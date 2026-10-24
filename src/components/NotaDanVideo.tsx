@@ -454,7 +454,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                   🤝 Kategori: Kata Permintaan
                 </span>
                 <span className="text-[11px] text-amber-800 font-semibold">
-                  (Memohon bantuan, sokongan, atau pertolongan)
+                  (Memohon bantuan, sokongan atau pertolongan)
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -546,13 +546,13 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                       </div>
                     </div>
                     <p className="text-[10px] text-slate-200 leading-snug italic mb-2">
-                      “Silaan dan permintaan mencerminkan pekerti mulia. Gunakan perkataan 'sila', 'jemput', dan 'tolong'!”
+                      “Silaan dan permintaan mencerminkan pekerti mulia. Gunakan perkataan 'sila', 'jemput' dan 'tolong'!”
                     </p>
                     <button
                       onClick={() => {
                         sound.playClick();
                         sound.speakMalay(
-                          'Salam sejahtera! Saya Cikgu Syafiqah. Ayat silaan dan permintaan mencerminkan pekerti mulia kita. Gunakan kata sila, jemput, dan tolong dengan santun.',
+                          'Salam sejahtera! Saya Cikgu Syafiqah. Ayat silaan dan permintaan mencerminkan pekerti mulia kita. Gunakan kata sila, jemput dan tolong dengan santun.',
                           'syafiqah'
                         );
                       }}

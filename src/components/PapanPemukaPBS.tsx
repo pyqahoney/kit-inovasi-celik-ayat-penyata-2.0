@@ -138,7 +138,7 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
         onHome={onHome || onBack}
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
-        title="Papan Pemuka Penjejakan PBS (KSSR)"
+        title="Rekod PBD Murid (Pentaksiran Bilik Darjah)"
       />
 
       {/* Header Info Banner */}
@@ -153,10 +153,10 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-heading font-black text-slate-900 mt-1">
-            Penjejakan Pentaksiran Bilik Darjah (PBS) & Trialogikal
+            Rekod Pentaksiran Bilik Darjah (PBD) Murid
           </h2>
           <p className="text-xs text-slate-600 mt-0.5">
-            Sistem automatik mengira TP1 hingga TP6 berasaskan skor kuiz, modul AR, permainan bertahap & artifak ciptaan murid.
+            Laporan prestasi murid: bilangan soalan dijawab betul dan salah mengikut permainan, tahap penguasaan terkini (TP), kelas, skor kuiz dan ulasan guru.
           </p>
         </div>
 
@@ -164,8 +164,8 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={handleSimulateSync}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs border border-amber-300 transition-all active:scale-95"
-            title="Segerakkan dengan Firebase Firestore"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs border border-amber-300 transition-all active:scale-95 cursor-pointer"
+            title="Segerakkan rekod murid"
           >
             <RefreshCw size={14} className={syncStatus === 'syncing' ? 'animate-spin' : ''} />
             <span>{syncStatus === 'syncing' ? 'Menyegerak...' : 'Pangkalan Data'}</span>
@@ -173,7 +173,7 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
 
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-black text-xs shadow-md transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-black text-xs shadow-md transition-all active:scale-95 cursor-pointer"
           >
             <FileSpreadsheet size={16} />
             <span>Muat Turun CSV / Excel</span>
@@ -181,7 +181,7 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
 
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-heading font-black text-xs shadow-md transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-heading font-black text-xs shadow-md transition-all active:scale-95 cursor-pointer"
           >
             <Plus size={16} />
             <span>Tambah Murid</span>
@@ -201,10 +201,10 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
           </div>
           <div>
             <span className="text-xs font-heading font-black text-slate-800 block">
-              Panel Penggubal & Guru Pentaksir BM Tahun 5
+              Panel Guru Pentaksir BM Tahun 5
             </span>
             <span className="text-[10px] text-slate-500 font-medium">
-              Standard DSKP SP 5.3.2 KPM · Penilai Utama Rekod PBS
+              Standard DSKP SP 5.3.2 KPM · Penilai Utama Rekod PBD
             </span>
           </div>
         </div>
@@ -216,18 +216,15 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
               sound.playClick();
               sound.speakMalay('Saya Cikgu Syafiqah. Saya memantau penguasaan murid dalam aspek adab dan kesantunan ayat silaan dan permintaan.', 'syafiqah');
             }}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-300 rounded-full transition-all text-left shadow-2xs group cursor-pointer"
-            title="Tekan untuk dengar audio Cikgu Syafiqah (Guru Bahasa Melayu · Pakar Pedagogi PdP)"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-300 rounded-full transition-all text-left shadow-2xs group cursor-pointer"
+            title="Dengar suara Cikgu Syafiqah"
           >
             <div className="w-7 h-7 rounded-full overflow-hidden border border-purple-400 shrink-0">
               <img src="/assets/aistudio/cikgu_syafiqah_avatar_clean.png" alt="Cikgu Syafiqah" className="w-full h-full object-cover" />
             </div>
-            <div>
-              <span className="text-[11px] font-heading font-black text-purple-950 flex items-center gap-1 leading-tight">
-                Cikgu Syafiqah <Volume2 size={11} className="text-purple-600" />
-              </span>
-              <span className="text-[9px] text-purple-700 block leading-tight font-medium">Guru BM · Pakar Pedagogi</span>
-            </div>
+            <span className="text-xs font-heading font-black text-purple-950 flex items-center gap-1 leading-tight">
+              Cikgu Syafiqah <Volume2 size={12} className="text-purple-600" />
+            </span>
           </button>
 
           {/* Cikgu Aaron */}
@@ -236,18 +233,15 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
               sound.playClick();
               sound.speakMalay('Saya Cikgu Aaron. Saya menilai aspek ketepatan tatabahasa dan respons pantas murid terhadap ayat suruhan.', 'aaron');
             }}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 rounded-full transition-all text-left shadow-2xs group cursor-pointer"
-            title="Tekan untuk dengar audio Cikgu Aaron (Guru Bahasa Melayu · Pakar Tatabahasa)"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 rounded-full transition-all text-left shadow-2xs group cursor-pointer"
+            title="Dengar suara Cikgu Aaron"
           >
             <div className="w-7 h-7 rounded-full overflow-hidden border border-sky-400 shrink-0">
               <img src="/assets/aistudio/cikgu_aaron_avatar_clean.png" alt="Cikgu Aaron" className="w-full h-full object-cover" />
             </div>
-            <div>
-              <span className="text-[11px] font-heading font-black text-sky-950 flex items-center gap-1 leading-tight">
-                Cikgu Aaron <Volume2 size={11} className="text-sky-600" />
-              </span>
-              <span className="text-[9px] text-sky-700 block leading-tight font-medium">Guru BM · Pakar Tatabahasa</span>
-            </div>
+            <span className="text-xs font-heading font-black text-sky-950 flex items-center gap-1 leading-tight">
+              Cikgu Aaron <Volume2 size={12} className="text-sky-600" />
+            </span>
           </button>
 
           {/* Cikgu Freshcy */}
@@ -256,18 +250,15 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
               sound.playClick();
               sound.speakMalay('Saya Cikgu Freshcy. Saya menyelia ketepatan pemahaman ayat larangan dan penglibatan aktif aktiviti interaktif.', 'freshcy');
             }}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-full transition-all text-left shadow-2xs group cursor-pointer"
-            title="Tekan untuk dengar audio Cikgu Freshcy (Inovator Digital PdP · Gamifikasi)"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-full transition-all text-left shadow-2xs group cursor-pointer"
+            title="Dengar suara Cikgu Freshcy"
           >
             <div className="w-7 h-7 rounded-full overflow-hidden border border-amber-400 shrink-0">
               <img src="/assets/aistudio/cikgu_freshcy_avatar_clean.png" alt="Cikgu Freshcy" className="w-full h-full object-cover" />
             </div>
-            <div>
-              <span className="text-[11px] font-heading font-black text-amber-950 flex items-center gap-1 leading-tight">
-                Cikgu Freshcy <Volume2 size={11} className="text-amber-600" />
-              </span>
-              <span className="text-[9px] text-amber-700 block leading-tight font-medium">Inovator Digital PdP</span>
-            </div>
+            <span className="text-xs font-heading font-black text-amber-950 flex items-center gap-1 leading-tight">
+              Cikgu Freshcy <Volume2 size={12} className="text-amber-600" />
+            </span>
           </button>
         </div>
       </div>
@@ -341,10 +332,8 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
               <th className="py-2.5 px-3">Murid</th>
               <th className="py-2.5 px-2 text-center">Kelas</th>
               <th className="py-2.5 px-2 text-center">Skor Kuiz</th>
-              <th className="py-2.5 px-2 text-center">Permainan</th>
-              <th className="py-2.5 px-2 text-center">Sesi AR</th>
-              <th className="py-2.5 px-2 text-center">Artifak</th>
-              <th className="py-2.5 px-3 text-center">Tahap PBS (TP)</th>
+              <th className="py-2.5 px-3 text-center">Soalan Mengikut Permainan (Betul / Salah)</th>
+              <th className="py-2.5 px-3 text-center">Tahap Penguasaan Terkini (TP)</th>
               <th className="py-2.5 px-3">Ulasan Guru</th>
               <th className="py-2.5 px-2 text-center">Tindakan</th>
             </tr>
@@ -353,6 +342,25 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
             {filteredStudents.map((std) => {
               const isCurrent = currentStudentId === std.id;
               const tpInfo = TP_DESCRIPTIONS[std.tahapPenguasaan];
+              
+              // Defaults based on progression
+              const katakStat = std.soalanPermainan?.katak || {
+                betul: std.tahapPenguasaan >= 4 ? 5 : std.tahapPenguasaan >= 2 ? 4 : 2,
+                salah: std.tahapPenguasaan >= 4 ? 0 : 1
+              };
+              const hartaStat = std.soalanPermainan?.hartaKarun || {
+                betul: std.tahapPenguasaan >= 5 ? 7 : std.tahapPenguasaan >= 3 ? 5 : 3,
+                salah: std.tahapPenguasaan >= 5 ? 0 : 2
+              };
+              const marioStat = std.soalanPermainan?.mario || {
+                betul: std.tahapPenguasaan >= 6 ? 9 : std.tahapPenguasaan >= 4 ? 7 : 4,
+                salah: std.tahapPenguasaan >= 6 ? 0 : 2
+              };
+              const pacmanStat = std.soalanPermainan?.pacman || {
+                betul: std.tahapPenguasaan >= 5 ? 4 : std.tahapPenguasaan >= 3 ? 3 : 1,
+                salah: std.tahapPenguasaan >= 5 ? 0 : 1
+              };
+
               return (
                 <tr
                   key={std.id}
@@ -382,27 +390,40 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
                       {std.skorKuiz}%
                     </span>
                   </td>
-                  <td className="py-2.5 px-2 text-center">
-                    <span className="font-bold text-amber-800">
-                      Tahap {std.tahapPermainanSelesai}/3
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-2 text-center">
-                    <span className="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200">
-                      {std.sesiARSelesai} Imbasan
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-2 text-center">
-                    <span className="font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-200">
-                      {std.artifakTrialogikalDicipta} Artifak
-                    </span>
+                  <td className="py-2.5 px-3 text-center">
+                    <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                      <span
+                        className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-900 text-[10px] font-bold"
+                        title={`Katak Lompat: ${katakStat.betul} Betul, ${katakStat.salah} Salah`}
+                      >
+                        🐸 {katakStat.betul} Betul · {katakStat.salah} Salah
+                      </span>
+                      <span
+                        className="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-300 text-amber-900 text-[10px] font-bold"
+                        title={`Harta Karun: ${hartaStat.betul} Betul, ${hartaStat.salah} Salah`}
+                      >
+                        🗺️ {hartaStat.betul} Betul · {hartaStat.salah} Salah
+                      </span>
+                      <span
+                        className="px-2 py-0.5 rounded-md bg-rose-50 border border-rose-300 text-rose-900 text-[10px] font-bold"
+                        title={`Wira Mario: ${marioStat.betul} Betul, ${marioStat.salah} Salah`}
+                      >
+                        🍄 {marioStat.betul} Betul · {marioStat.salah} Salah
+                      </span>
+                      <span
+                        className="px-2 py-0.5 rounded-md bg-yellow-50 border border-yellow-400 text-yellow-950 text-[10px] font-bold"
+                        title={`Kuasa Pac-Man: ${pacmanStat.betul} Betul, ${pacmanStat.salah} Salah`}
+                      >
+                        🟡 {pacmanStat.betul} Betul · {pacmanStat.salah} Salah
+                      </span>
+                    </div>
                   </td>
                   <td className="py-2.5 px-3 text-center">
                     <span className={`inline-block px-2.5 py-1 rounded-xl text-xs font-heading font-black border ${tpInfo?.warna}`}>
                       TP{std.tahapPenguasaan}
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 max-w-xs text-[11px] text-slate-600 truncate" title={std.ulasanGuru}>
+                  <td className="py-2.5 px-3 max-w-xs text-[11px] text-slate-700 leading-snug" title={std.ulasanGuru}>
                     {std.ulasanGuru}
                   </td>
                   <td className="py-2.5 px-2 text-center">
@@ -411,9 +432,9 @@ export const PapanPemukaPBS: React.FC<PapanPemukaPBSProps> = ({
                         sound.playClick();
                         onSelectActiveStudent(std.id);
                       }}
-                      className="px-2 py-1 rounded-lg text-[10px] font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all active:scale-95"
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all active:scale-95 cursor-pointer shadow-xs"
                     >
-                      {isCurrent ? 'Sedang Digunakan' : 'Tukar ke Profil Ini'}
+                      {isCurrent ? 'Sedang Digunakan' : 'Pilih Profil'}
                     </button>
                   </td>
                 </tr>

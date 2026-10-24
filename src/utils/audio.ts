@@ -9,6 +9,9 @@ const NINTENDO_CAFE_BGM_URL =
 class SoundController {
   private audioCtx: AudioContext | null = null;
   public enabled: boolean = true;
+  public bgmEnabled: boolean = true;
+  public sfxEnabled: boolean = true;
+  private audioListeners: Set<(state: { bgmEnabled: boolean; sfxEnabled: boolean }) => void> = new Set();
   private bgmAudio: HTMLAudioElement | null = null;
   private isBGMPlaying: boolean = false;
   private isSpeaking: boolean = false;
@@ -18,6 +21,49 @@ class SoundController {
   // Normal and ducked volumes for Nintendo Cafe BGM
   private readonly NORMAL_BGM_VOLUME = 0.35;
   private readonly DUCKED_BGM_VOLUME = 0.08;
+
+  public onAudioStateChange(fn: (state: { bgmEnabled: boolean; sfxEnabled: boolean }) => void) {
+    this.audioListeners.add(fn);
+    return () => this.audioListeners.delete(fn);
+  }
+
+  private notifyAudioListeners() {
+    this.audioListeners.forEach((fn) =>
+      fn({ bgmEnabled: this.bgmEnabled, sfxEnabled: this.sfxEnabled })
+    );
+  }
+
+  public toggleBGM(): boolean {
+    this.bgmEnabled = !this.bgmEnabled;
+    if (!this.bgmEnabled) {
+      this.stopBGM();
+    } else {
+      this.startBGM();
+    }
+    this.notifyAudioListeners();
+    return this.bgmEnabled;
+  }
+
+  public setBGMEnabled(val: boolean) {
+    this.bgmEnabled = val;
+    if (!this.bgmEnabled) {
+      this.stopBGM();
+    } else {
+      this.startBGM();
+    }
+    this.notifyAudioListeners();
+  }
+
+  public toggleSFX(): boolean {
+    this.sfxEnabled = !this.sfxEnabled;
+    this.notifyAudioListeners();
+    return this.sfxEnabled;
+  }
+
+  public setSFXEnabled(val: boolean) {
+    this.sfxEnabled = val;
+    this.notifyAudioListeners();
+  }
 
   private getAudioContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;
@@ -66,7 +112,11 @@ class SoundController {
 
   // Set and play module-specific BGM
   playModuleBGM(module: 'default' | 'frog' | 'mario' | 'treasure' | 'pacman') {
-    if (!this.enabled) return;
+    this.currentModule = module;
+    if (!this.enabled || !this.bgmEnabled) {
+      this.stopBGM();
+      return;
+    }
 
     // If default Nintendo Cafe BGM is already actively playing, keep it continuous
     if (
@@ -399,7 +449,7 @@ class SoundController {
 
   // Play synthetic tone
   playTone(freq: number, type: OscillatorType, duration: number, delay = 0) {
-    if (!this.enabled) return;
+    if (!this.enabled || !this.sfxEnabled) return;
     try {
       const ctx = this.getAudioContext();
       if (!ctx) return;
@@ -441,7 +491,7 @@ class SoundController {
 
   // Frog jumping spring sound
   playFrogHop() {
-    if (!this.enabled) return;
+    if (!this.enabled || !this.sfxEnabled) return;
     try {
       const ctx = this.getAudioContext();
       if (!ctx) return;
@@ -462,7 +512,7 @@ class SoundController {
 
   // Realistic water splash when frog drops into river
   playWaterSplash() {
-    if (!this.enabled) return;
+    if (!this.enabled || !this.sfxEnabled) return;
     try {
       const ctx = this.getAudioContext();
       if (!ctx) return;
@@ -562,7 +612,7 @@ class SoundController {
 
   // Realistic Crowd Applause & cheering hand claps sound effect
   playApplause() {
-    if (!this.enabled) return;
+    if (!this.enabled || !this.sfxEnabled) return;
     try {
       const ctx = this.getAudioContext();
       if (!ctx) return;
@@ -617,16 +667,17 @@ class SoundController {
 
   // Click / tap bubble sound for every button with debounce protection
   playClick() {
-    if (!this.enabled) return;
     const now = Date.now();
     // 50ms debounce to prevent double-sounding if an element has both universal and local trigger
     if (now - this.lastClickTimestamp < 50) return;
     this.lastClickTimestamp = now;
 
-    this.playTone(620, 'sine', 0.08, 0);
+    if (this.enabled && this.sfxEnabled) {
+      this.playTone(620, 'sine', 0.08, 0);
+    }
 
     // If default BGM is active and unpaused, make sure it plays upon user gesture
-    if (this.currentModule === 'default') {
+    if (this.currentModule === 'default' && this.enabled && this.bgmEnabled) {
       const bgm = this.getBGMAudio();
       if (bgm && bgm.paused) {
         bgm.volume = this.isSpeaking ? this.DUCKED_BGM_VOLUME : this.NORMAL_BGM_VOLUME;

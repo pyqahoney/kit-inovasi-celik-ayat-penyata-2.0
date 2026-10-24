@@ -103,7 +103,7 @@ const DRAMA_SCENES: DramaScene[] = [
     jenis: 'rumusan',
     latar: 'peta_minda',
     huraian: 'Rumusan lengkap 4 kata perintah yang dipelajari daripada pementasan drama SK Seri Kundang.',
-    narration: 'Berikut merupakan contoh kata yang digunakan untuk membentuk ayat perintah dalam pementasan drama tadi: Jangan untuk larangan, Harap untuk permintaan, Pergilah untuk suruhan, dan Jemputlah untuk silaan.',
+    narration: 'Berikut merupakan contoh kata yang digunakan untuk membentuk ayat perintah dalam pementasan drama tadi: Jangan untuk larangan, Harap untuk permintaan, Pergilah untuk suruhan dan Jemputlah untuk silaan.',
     warnaTema: 'bg-indigo-100 text-indigo-950 border-indigo-400'
   }
 ];
@@ -626,7 +626,7 @@ export const TeaterDramaVideo: React.FC<{
                 Video Pementasan Drama: Jangan Toleh Belakang
               </h4>
               <p className="text-xs text-slate-400 max-w-md leading-relaxed mb-4">
-                Video pementasan drama SK Seri Kundang ini mengandungi babak Nenek (Jangan), Cucu (Harap), Wanita Kampung (Pergilah), dan Lelaki Budiman (Jemputlah).
+                Video pementasan drama SK Seri Kundang ini mengandungi babak Nenek (Jangan), Cucu (Harap), Wanita Kampung (Pergilah) dan Lelaki Budiman (Jemputlah).
               </p>
 
               {/* Upload Local Video Button */}

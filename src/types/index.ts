@@ -115,6 +115,12 @@ export interface StudentPBSRecord {
   ulasanGuru: string;
   tarikhKemasKini: string;
   kataLaluan?: string;
+  soalanPermainan?: {
+    katak?: { betul: number; salah: number };
+    hartaKarun?: { betul: number; salah: number };
+    mario?: { betul: number; salah: number };
+    pacman?: { betul: number; salah: number };
+  };
 }
 
 export interface UserProgressState {

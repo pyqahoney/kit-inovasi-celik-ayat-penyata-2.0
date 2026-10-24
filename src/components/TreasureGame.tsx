@@ -118,6 +118,7 @@ const TREASURE_MISSIONS = [
 
 export const TreasureGame: React.FC<TreasureGameProps> = ({
   onBack,
+  onHome,
   onComplete,
   soundEnabled,
   onToggleSound

@@ -62,14 +62,14 @@ const FROG_QUESTIONS = [
     sentenceStart: 'Terdapat',
     blankText: '_____',
     sentenceEnd: 'jenis ayat perintah.',
-    fullSentence: 'Terdapat 4 jenis ayat perintah: suruhan, larangan, silaan, dan permintaan.',
+    fullSentence: 'Terdapat 4 jenis ayat perintah: suruhan, larangan, silaan dan permintaan.',
     options: [
       { key: 'A', text: '4', isCorrect: true },
       { key: 'B', text: '5', isCorrect: false },
       { key: 'C', text: '3', isCorrect: false }
     ],
     correctOptionKey: 'A',
-    explanation: 'Empat jenis ayat perintah ialah: Ayat Suruhan, Ayat Larangan, Ayat Silaan, dan Ayat Permintaan.'
+    explanation: 'Empat jenis ayat perintah ialah: Ayat Suruhan, Ayat Larangan, Ayat Silaan dan Ayat Permintaan.'
   },
   {
     id: 5,
@@ -89,6 +89,7 @@ const FROG_QUESTIONS = [
 
 export const FrogGame: React.FC<FrogGameProps> = ({
   onBack,
+  onHome,
   onComplete,
   soundEnabled,
   onToggleSound
@@ -477,7 +478,7 @@ export const FrogGame: React.FC<FrogGameProps> = ({
               </div>
               <div className="flex items-start gap-3">
                 <span className="w-7 h-7 rounded-full bg-[#7f4f24] text-white flex items-center justify-center font-bold text-sm shrink-0">2</span>
-                <p>Tekan daun teratai (A, B, atau C) dengan jawapan yang betul.</p>
+                <p>Tekan daun teratai (A, B atau C) dengan jawapan yang betul.</p>
               </div>
               <div className="flex items-start gap-3">
                 <span className="w-7 h-7 rounded-full bg-[#7f4f24] text-white flex items-center justify-center font-bold text-sm shrink-0">3</span>
@@ -672,7 +673,7 @@ export const FrogGame: React.FC<FrogGameProps> = ({
                           : 'Tunjukkan tangan di hadapan kamera pada daun teratai di alam nyata!'}
                       </span>
                       <span className="text-[8px] sm:text-[9px] text-cyan-300 font-mono block">
-                        Halakan jari/tangan anda ke daun teratai (A, B, atau C) untuk memilih
+                        Halakan jari/tangan anda ke daun teratai (A, B atau C) untuk memilih
                       </span>
                     </div>
                   </div>

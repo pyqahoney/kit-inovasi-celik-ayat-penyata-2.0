@@ -467,117 +467,267 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
                 </button>
               </div>
             </div>
-          )}
+          {/* MOD AR: Two-Column Side-by-Side Layout (Soalan Sebelah Kiri, Kamera Sebelah Kanan) */}
+          {mode === 'ar' ? (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 my-1 items-stretch flex-1">
+              {/* SEBELAH KIRI: Soalan, Pilihan Jawapan & Panduan Bentuk Tangan (7 Kolum) */}
+              <div className="lg:col-span-7 flex flex-col justify-between p-4 sm:p-5 rounded-3xl bg-white/95 border-3 border-purple-400 shadow-xl text-slate-900">
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="font-heading font-black text-sm sm:text-base text-purple-900">
+                      Soalan {qIndex + 1} daripada {DRILL_QUESTIONS.length}
+                    </span>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-heading font-bold bg-purple-100 text-purple-900 border border-purple-300 shadow-2xs">
+                      <span>💡</span>
+                      <span><strong>Pembayang:</strong> {cur.clue}</span>
+                    </div>
+                  </div>
 
-          {/* Question Card Content Container */}
-          <div
-            className={`relative max-w-2xl mx-auto w-full p-5 sm:p-7 rounded-3xl border-3 shadow-xl text-center z-10 transition-all ${
-              mode === 'ar'
-                ? 'bg-black/75 backdrop-blur-md border-purple-400 text-white'
-                : 'bg-white/95 border-dashed border-amber-400'
-            }`}
-          >
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-3">
-              <span className={`font-heading font-black text-lg ${mode === 'ar' ? 'text-amber-300' : 'text-amber-800'}`}>
-                Soalan {qIndex + 1} daripada {DRILL_QUESTIONS.length}
-              </span>
+                  {/* Sentence with blank */}
+                  <div className="text-base sm:text-xl font-heading font-bold my-3 p-3 rounded-2xl bg-amber-50/80 border-2 border-amber-300 text-slate-800 leading-relaxed text-center">
+                    {cur.sentenceStart && <span>{cur.sentenceStart} </span>}
+                    <span
+                      className={`inline-block px-3 py-1 rounded-xl mx-1 font-extrabold transition-all ${
+                        showAnswer
+                          ? 'bg-emerald-500 text-white border-2 border-emerald-400 animate-bounce'
+                          : userChoice
+                          ? 'bg-amber-400 text-amber-950 border-2 border-amber-600 scale-105'
+                          : 'bg-purple-200 text-purple-950 border-2 border-dashed border-purple-400'
+                      }`}
+                    >
+                      {showAnswer ? cur.answer1 : userChoice || cur.blank1}
+                    </span>
+                    <span>{cur.sentenceMid} </span>
+                    {cur.blank2 && (
+                      <span
+                        className={`inline-block px-3 py-1 rounded-xl mx-1 font-extrabold transition-all ${
+                          showAnswer
+                            ? 'bg-emerald-500 text-white border-2 border-emerald-400 animate-bounce'
+                            : 'bg-purple-200 text-purple-950 border-2 border-dashed border-purple-400'
+                        }`}
+                      >
+                        {showAnswer ? cur.answer2 : cur.blank2}
+                      </span>
+                    )}
+                    {cur.sentenceEnd && <span>{cur.sentenceEnd}</span>}
+                  </div>
 
-              {/* Clue Badge */}
-              <div
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-bold shadow-xs ${
-                  mode === 'ar'
-                    ? 'bg-purple-900/90 text-purple-200 border border-purple-400'
-                    : 'bg-amber-100 text-amber-900 border border-amber-300'
-                }`}
-              >
-                <span>💡</span>
-                <span>
-                  <strong>Pembayang:</strong> {cur.clue}
-                </span>
+                  {/* Instructions on Hand Shapes */}
+                  <div className="p-2.5 rounded-xl bg-purple-50 border border-purple-200 mb-3 text-center">
+                    <p className="text-xs font-heading font-bold text-purple-950 flex items-center justify-center gap-1">
+                      <span>✋</span>
+                      <span>Tunjukkan bentuk tangan anda di hadapan kamera sebelah kanan:</span>
+                    </p>
+                  </div>
+
+                  {/* 3 Hand-Shape Choices */}
+                  <div className="space-y-2">
+                    {cur.choices.map((c, idx) => {
+                      const isGrabbed = userChoice === c;
+                      const isTarget = detectedHandIdx === idx;
+                      const handSymbol = idx === 0 ? '☝️' : idx === 1 ? '✌️' : '✋';
+                      const handLabel = idx === 0 ? '1 Jari (Telunjuk)' : idx === 1 ? '2 Jari (Peace / V)' : '3 Jari / Terbuka';
+
+                      return (
+                        <button
+                          key={c}
+                          onClick={() => handleGrabChoice(c)}
+                          className={`w-full p-3 rounded-2xl font-heading font-black text-sm border-2 cursor-pointer transition-all flex items-center justify-between gap-3 shadow-xs active:scale-98 ${
+                            isGrabbed
+                              ? 'bg-gradient-to-r from-yellow-300 via-amber-400 to-amber-500 text-amber-950 border-amber-600 ring-3 ring-amber-400 scale-102'
+                              : isTarget
+                              ? 'bg-purple-100 text-purple-950 border-purple-500 ring-2 ring-purple-400 scale-101'
+                              : 'bg-white hover:bg-purple-50 text-slate-800 border-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-9 h-9 rounded-xl bg-purple-200 border border-purple-400 flex items-center justify-center text-xl shrink-0 shadow-xs">
+                              {handSymbol}
+                            </span>
+                            <div className="text-left">
+                              <span className="text-[10px] text-purple-700 font-bold block uppercase tracking-wider">
+                                Bentuk Tangan {idx + 1}: {handLabel}
+                              </span>
+                              <span className="text-sm font-black text-slate-900">{c}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {isTarget && handDwellProgress > 0 && !isGrabbed && (
+                              <span className="text-[11px] font-mono font-bold text-purple-700 bg-purple-200 px-2 py-0.5 rounded-full animate-pulse">
+                                Mengunci {handDwellProgress}%
+                              </span>
+                            )}
+                            {isGrabbed && (
+                              <span className="text-xs font-black text-amber-950 bg-white/80 px-2.5 py-1 rounded-full border border-amber-400 shadow-2xs">
+                                Dipilih ✓
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Left Bottom Action: Reveal Answer */}
+                <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between gap-2">
+                  <span className="text-[11px] text-slate-500 font-medium">
+                    Anda boleh tunjuk isyarat tangan atau sentuh kad pilihan terus.
+                  </span>
+                  <button
+                    onClick={handleReveal}
+                    className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
+                  >
+                    Jawapan Lengkap
+                  </button>
+                </div>
+              </div>
+
+              {/* SEBELAH KANAN: Paparan Kamera Murid Yang Luas & Jelas (5 Kolum) */}
+              <div className="lg:col-span-5 flex flex-col justify-between rounded-3xl overflow-hidden border-4 border-purple-500 shadow-xl bg-slate-950 relative min-h-[340px] sm:min-h-[400px]">
+                {/* Real Camera Feed */}
+                {cameraActive ? (
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className={`w-full h-full object-cover absolute inset-0 ${
+                      facingMode === 'user' ? 'scale-x-[-1]' : ''
+                    }`}
+                  />
+                ) : (
+                  <div className="w-full h-full absolute inset-0 bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 flex flex-col items-center justify-center p-4 text-center text-white">
+                    <div className="w-14 h-14 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center text-3xl mb-2 animate-bounce">
+                      ✋
+                    </div>
+                    <h4 className="font-heading font-black text-sm text-purple-200">
+                      Kamera AR Diaktifkan
+                    </h4>
+                    <p className="text-[11px] text-slate-300 max-w-xs mt-1">
+                      Sila benarkan akses kamera untuk melihat diri anda dan menjawab menggunakan bentuk tangan!
+                    </p>
+                  </div>
+                )}
+
+                {/* Camera Top Controls Bar */}
+                <div className="relative z-20 p-2.5 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-950/80 border border-purple-400/60 backdrop-blur-sm text-white text-[11px] font-heading font-bold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                    <span>Kamera Murid</span>
+                  </div>
+
+                  <button
+                    onClick={toggleFacingMode}
+                    className="p-1.5 px-2.5 rounded-xl bg-black/70 hover:bg-black/90 text-white text-xs flex items-center gap-1 border border-white/30 backdrop-blur-sm cursor-pointer shadow-xs active:scale-95"
+                    title="Tukar Kamera Depan / Belakang"
+                  >
+                    <FlipHorizontal size={13} />
+                    <span className="text-[10px]">Tukar</span>
+                  </button>
+                </div>
+
+                {/* Hand Gesture Detection Indicator in Camera Feed */}
+                <div className="relative z-20 m-3 p-2.5 rounded-2xl bg-black/75 border border-purple-400/80 backdrop-blur-md text-white">
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <span className="text-[11px] font-heading font-black text-purple-200 flex items-center gap-1">
+                      <span>🎯</span>
+                      <span>Pengesan Bentuk Tangan:</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-yellow-300 font-bold">
+                      {detectedHandIdx !== null
+                        ? `Bentuk ${detectedHandIdx + 1} (${handDwellProgress}%)`
+                        : 'Menunggu isyarat...'}
+                    </span>
+                  </div>
+
+                  {/* Visual Hand Shape Helpers for Pupil */}
+                  <div className="grid grid-cols-3 gap-1.5 text-center">
+                    <button
+                      onClick={() => handleGrabChoice(cur.choices[0])}
+                      className={`p-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
+                        detectedHandIdx === 0
+                          ? 'bg-yellow-400 text-slate-950 border-white ring-2 ring-yellow-400 scale-102 font-black'
+                          : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                      }`}
+                    >
+                      <span className="text-base block">☝️</span>
+                      <span>1 Jari</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleGrabChoice(cur.choices[1])}
+                      className={`p-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
+                        detectedHandIdx === 1
+                          ? 'bg-yellow-400 text-slate-950 border-white ring-2 ring-yellow-400 scale-102 font-black'
+                          : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                      }`}
+                    >
+                      <span className="text-base block">✌️</span>
+                      <span>2 Jari</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleGrabChoice(cur.choices[2])}
+                      className={`p-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
+                        detectedHandIdx === 2
+                          ? 'bg-yellow-400 text-slate-950 border-white ring-2 ring-yellow-400 scale-102 font-black'
+                          : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                      }`}
+                    >
+                      <span className="text-base block">✋</span>
+                      <span>3 Jari</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
+          ) : (
+            /* MOD BIASA: Single Column Standard View */
+            <div className="relative max-w-2xl mx-auto w-full p-5 sm:p-7 rounded-3xl border-3 border-dashed border-amber-400 bg-white/95 shadow-xl text-center z-10 transition-all">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-3">
+                <span className="font-heading font-black text-lg text-amber-800">
+                  Soalan {qIndex + 1} daripada {DRILL_QUESTIONS.length}
+                </span>
 
-            {/* Sentence Display */}
-            <div
-              className={`text-xl sm:text-2xl font-heading font-bold my-4 leading-relaxed ${
-                mode === 'ar' ? 'text-white' : 'text-slate-800'
-              }`}
-            >
-              {cur.sentenceStart && <span>{cur.sentenceStart} </span>}
-              <span
-                className={`inline-block px-3 py-1 rounded-xl mx-1 font-extrabold transition-all ${
-                  showAnswer
-                    ? 'bg-emerald-500 text-white border-2 border-emerald-300 animate-bounce'
-                    : userChoice
-                    ? 'bg-amber-400 text-amber-950 border-2 border-amber-600 scale-105'
-                    : mode === 'ar'
-                    ? 'bg-purple-900/80 text-purple-200 border-2 border-dashed border-purple-400'
-                    : 'bg-amber-100 text-amber-900 border-2 border-dashed border-amber-400'
-                }`}
-              >
-                {showAnswer ? cur.answer1 : userChoice || cur.blank1}
-              </span>
-              <span>{cur.sentenceMid} </span>
-              {cur.blank2 && (
+                {/* Clue Badge */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-bold shadow-xs bg-amber-100 text-amber-900 border border-amber-300">
+                  <span>💡</span>
+                  <span><strong>Pembayang:</strong> {cur.clue}</span>
+                </div>
+              </div>
+
+              {/* Sentence Display */}
+              <div className="text-xl sm:text-2xl font-heading font-bold my-4 leading-relaxed text-slate-800">
+                {cur.sentenceStart && <span>{cur.sentenceStart} </span>}
                 <span
                   className={`inline-block px-3 py-1 rounded-xl mx-1 font-extrabold transition-all ${
                     showAnswer
                       ? 'bg-emerald-500 text-white border-2 border-emerald-300 animate-bounce'
-                      : mode === 'ar'
-                      ? 'bg-purple-900/80 text-purple-200 border-2 border-dashed border-purple-400'
+                      : userChoice
+                      ? 'bg-amber-400 text-amber-950 border-2 border-amber-600 scale-105'
                       : 'bg-amber-100 text-amber-900 border-2 border-dashed border-amber-400'
                   }`}
                 >
-                  {showAnswer ? cur.answer2 : cur.blank2}
+                  {showAnswer ? cur.answer1 : userChoice || cur.blank1}
                 </span>
-              )}
-              {cur.sentenceEnd && <span>{cur.sentenceEnd}</span>}
-            </div>
-
-            {/* MOD AR: Floating Hand-Grab Cards with Optical Dwell Circle */}
-            {mode === 'ar' ? (
-              <div className="my-4">
-                <div className="flex items-center justify-center gap-2 mb-2 text-xs font-heading font-bold text-yellow-300">
-                  <Hand size={16} className="animate-bounce" />
-                  <span>
-                    Halakan tangan di hadapan kad atau sentuh untuk <strong>GRAB</strong>:
+                <span>{cur.sentenceMid} </span>
+                {cur.blank2 && (
+                  <span
+                    className={`inline-block px-3 py-1 rounded-xl mx-1 font-extrabold transition-all ${
+                      showAnswer
+                        ? 'bg-emerald-500 text-white border-2 border-emerald-300 animate-bounce'
+                        : 'bg-amber-100 text-amber-900 border-2 border-dashed border-amber-400'
+                    }`}
+                  >
+                    {showAnswer ? cur.answer2 : cur.blank2}
                   </span>
-                </div>
-                <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
-                  {cur.choices.map((c, idx) => {
-                    const isGrabbed = userChoice === c;
-                    const isTargetHand = detectedHandIdx === idx;
-                    return (
-                      <button
-                        key={c}
-                        onClick={() => handleGrabChoice(c)}
-                        className={`relative p-3 rounded-2xl font-heading font-black text-sm sm:text-base border-3 cursor-pointer transition-all transform active:scale-95 flex flex-col items-center justify-center gap-1 shadow-lg ${
-                          isGrabbed
-                            ? 'bg-gradient-to-b from-yellow-300 to-amber-500 text-slate-950 border-white scale-110 ring-4 ring-yellow-400 shadow-[0_0_20px_#facc15]'
-                            : isTargetHand
-                            ? 'bg-gradient-to-b from-purple-500 to-indigo-600 text-white border-yellow-300 scale-105 ring-4 ring-yellow-300'
-                            : 'bg-purple-800/90 hover:bg-purple-700 text-white border-purple-400 hover:scale-105'
-                        }`}
-                      >
-                        {/* Dwell Progress Indicator on Hand Detection */}
-                        {isTargetHand && handDwellProgress > 0 && !isGrabbed && (
-                          <div className="absolute inset-0 rounded-2xl border-4 border-yellow-400 bg-yellow-400/20 flex items-center justify-center">
-                            <span className="text-xs font-black text-yellow-300 bg-black/80 px-2 py-0.5 rounded-full">
-                              GRABBING {handDwellProgress}%
-                            </span>
-                          </div>
-                        )}
-
-                        <span className="text-xl">✋</span>
-                        <span>{c}</span>
-                        {isGrabbed && <span className="text-[10px] text-amber-950 font-black">TERGRAB!</span>}
-                      </button>
-                    );
-                  })}
-                </div>
+                )}
+                {cur.sentenceEnd && <span>{cur.sentenceEnd}</span>}
               </div>
-            ) : (
-              /* MOD BIASA: Standard Multiple Choice Buttons */
+
+              {/* Multiple Choice Buttons */}
               <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
                 {cur.choices.map((c) => (
                   <button
@@ -596,18 +746,18 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
                   </button>
                 ))}
               </div>
-            )}
 
-            {/* Reveal Answer Button */}
-            <div className="mt-5 flex justify-center gap-3">
-              <button
-                onClick={handleReveal}
-                className="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
-              >
-                Tunjukkan Jawapan Lengkap
-              </button>
+              {/* Reveal Answer Button */}
+              <div className="mt-5 flex justify-center gap-3">
+                <button
+                  onClick={handleReveal}
+                  className="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                >
+                  Tunjukkan Jawapan Lengkap
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 

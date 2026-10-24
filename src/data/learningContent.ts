@@ -86,8 +86,8 @@ export const AYAT_PERINTAH_DATA: Record<string, AyatPerintahDetail> = {
     title: 'Ayat Silaan',
     badgeTitle: 'Pakar Ayat Silaan',
     kataKunci: ['Sila', 'Jemput'],
-    maksud: 'Ayat yang menggunakan kata silaan seperti "sila" atau "jemput" dengan tujuan menjemput, mengalu-alukan, atau mempersilakan seseorang dengan tertib dan beradab.',
-    ciriKhas: 'Lazimnya diucapkan oleh tuan rumah, penganjur majlis, atau penyambut tetamu. Boleh dilembutkan dengan imbuhan "-lah" (contoh: Silakan, Jemputlah).',
+    maksud: 'Ayat yang menggunakan kata silaan seperti "sila" atau "jemput" dengan tujuan menjemput, mengalu-alukan atau mempersilakan seseorang dengan tertib dan beradab.',
+    ciriKhas: 'Lazimnya diucapkan oleh tuan rumah, penganjur majlis atau penyambut tetamu. Boleh dilembutkan dengan imbuhan "-lah" (contoh: Silakan, Jemputlah).',
     contohAyat: [
       {
         ayat: 'Sila masuk dan duduk di ruang tamu.',
@@ -126,7 +126,7 @@ export const AYAT_PERINTAH_DATA: Record<string, AyatPerintahDetail> = {
     title: 'Ayat Permintaan',
     badgeTitle: 'Duta Kesopanan Permintaan',
     kataKunci: ['Tolong', 'Minta', 'Harap'],
-    maksud: 'Ayat yang menggunakan kata permintaan seperti "tolong", "minta", atau "harap" untuk memohon bantuan atau menyatakan harapan dengan nada yang sangat sopan.',
+    maksud: 'Ayat yang menggunakan kata permintaan seperti "tolong", "minta" atau "harap" untuk memohon bantuan atau menyatakan harapan dengan nada yang sangat sopan.',
     ciriKhas: '"Tolong" merujuk permohonan pertolongan fizikal/tindakan. "Minta" merujuk permintaan rasmi/perhatian. "Harap" menyatakan pengharapan yang tinggi.',
     contohAyat: [
       {
@@ -809,12 +809,12 @@ export const TP_DESCRIPTIONS: Record<number, { tajuk: string; huraian: string; w
   },
   5: {
     tajuk: 'TP5 - Berkomunikasi Tekal & Berhikmah',
-    huraian: 'Murid menggunakan intonasi, partikel penegas, dan kata perintah santun secara konsisten.',
+    huraian: 'Murid menggunakan intonasi, partikel penegas dan kata perintah santun secara konsisten.',
     warna: 'text-emerald-800 bg-emerald-100 border-emerald-300'
   },
   6: {
     tajuk: 'TP6 - Cemerlang, Kreatif & Menjadi Teladan',
-    huraian: 'Murid mampu menilai, berkolaborasi, dan mereka cipta artifak pembelajaran (poster/papan tanda) yang bermakna mengikut Model Trialogikal.',
+    huraian: 'Murid mampu menilai, berkolaborasi dan mereka cipta artifak pembelajaran (poster/papan tanda) yang bermakna mengikut Model Trialogikal.',
     warna: 'text-purple-800 bg-purple-100 border-purple-300'
   }
 };

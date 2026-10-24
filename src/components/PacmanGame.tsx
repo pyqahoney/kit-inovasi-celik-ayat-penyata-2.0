@@ -150,6 +150,7 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
   const [feedback, setFeedback] = useState<{ isCorrect: boolean; text: string } | null>(null);
   const [answeredCount, setAnsweredCount] = useState(0);
   const [stageFinished, setStageFinished] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
   const [chompFrame, setChompFrame] = useState(false);
 
   // Direction buffer ref
@@ -221,7 +222,7 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
 
   // Main Pacman Movement Tick (380ms for relaxed, smooth children gameplay)
   useEffect(() => {
-    if (activeChallenge || stageFinished) return;
+    if (activeChallenge || stageFinished || isGameOver) return;
 
     const interval = setInterval(() => {
       setChompFrame((prev) => !prev);

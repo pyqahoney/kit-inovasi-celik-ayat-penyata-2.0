@@ -2,18 +2,46 @@ import React from 'react';
 import { Home, X, HelpCircle, Volume2, VolumeX, ArrowLeft, ArrowRight, Play } from 'lucide-react';
 import { sound } from '../utils/audio';
 
-// Top Bar with X, Home, Help, and Sound Toggle
+// Top Bar with X, Home, Help, and Dual Audio Toggle Popover
 export const TopNavBar: React.FC<{
   onHome?: () => void;
   onExit?: () => void;
   onHelp?: () => void;
   soundEnabled: boolean;
-  onToggleSound: () => void;
+  onToggleSound?: () => void;
   title?: string;
   className?: string;
 }> = ({ onHome, onExit, onHelp, soundEnabled, onToggleSound, title, className = '' }) => {
+  const [showAudioMenu, setShowAudioMenu] = React.useState(false);
+  const [bgmOn, setBgmOn] = React.useState(sound.bgmEnabled);
+  const [sfxOn, setSfxOn] = React.useState(sound.sfxEnabled);
+
+  React.useEffect(() => {
+    const unsub = sound.onAudioStateChange((st) => {
+      setBgmOn(st.bgmEnabled);
+      setSfxOn(st.sfxEnabled);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleToggleBgm = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    sound.playClick();
+    const next = sound.toggleBGM();
+    setBgmOn(next);
+    if (onToggleSound) onToggleSound();
+  };
+
+  const handleToggleSfx = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    sound.playClick();
+    const next = sound.toggleSFX();
+    setSfxOn(next);
+    if (onToggleSound) onToggleSound();
+  };
+
   return (
-    <div className={`flex items-center justify-between w-full px-4 py-2 z-30 ${className}`}>
+    <div className={`relative flex items-center justify-between w-full px-4 py-2 z-30 ${className}`}>
       {/* Left side actions */}
       <div className="flex items-center gap-2">
         {onExit && (
@@ -22,9 +50,9 @@ export const TopNavBar: React.FC<{
               sound.playClick();
               onExit();
             }}
-            aria-label="Keluar / Kembali"
-            title="Keluar / Kembali"
-            className="w-11 h-11 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 text-white flex items-center justify-center shadow-lg border-2 border-white transition-all transform hover:rotate-6"
+            aria-label="Kembali"
+            title="Kembali"
+            className="w-11 h-11 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 text-white flex items-center justify-center shadow-lg border-2 border-white transition-all transform hover:rotate-6 cursor-pointer"
           >
             <X size={26} strokeWidth={3.5} />
           </button>
@@ -36,9 +64,9 @@ export const TopNavBar: React.FC<{
               sound.playClick();
               onHome();
             }}
-            aria-label="Halaman Utama"
-            title="Halaman Utama"
-            className="w-11 h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white flex items-center justify-center shadow-lg border-2 border-white transition-all transform hover:-rotate-6"
+            aria-label="Laman Utama"
+            title="Laman Utama"
+            className="w-11 h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white flex items-center justify-center shadow-lg border-2 border-white transition-all transform hover:-rotate-6 cursor-pointer"
           >
             <Home size={24} strokeWidth={2.8} />
           </button>
@@ -53,24 +81,110 @@ export const TopNavBar: React.FC<{
       )}
 
       {/* Right side actions */}
-      <div className="flex items-center gap-2">
-        {/* Audio Toggle */}
+      <div className="flex items-center gap-2 relative">
+        {/* Audio Toggle Button Opening 2 Options */}
         <button
           onClick={() => {
             sound.playClick();
-            onToggleSound();
+            setShowAudioMenu((prev) => !prev);
           }}
-          aria-label={soundEnabled ? "Bunyi Hidup" : "Bunyi Senyap"}
-          title={soundEnabled ? "Lagu Nintendo Café: AKTIF (Tekan untuk bisu)" : "Lagu Latar: BISU (Tekan untuk mainkan lagu)"}
+          aria-label="Pilihan Bunyi & Muzik"
+          title="Tekan untuk memilih tutup lagu latar atau tutup kesan bunyi"
           className={`flex items-center gap-1.5 px-3 py-2 rounded-full shadow-lg border-2 border-white transition-all text-xs font-heading font-black cursor-pointer ${
-            soundEnabled
+            bgmOn || sfxOn
               ? 'bg-amber-400 text-amber-950 hover:bg-amber-500'
               : 'bg-slate-300 text-slate-600 hover:bg-slate-400'
           }`}
         >
-          {soundEnabled ? <Volume2 size={20} strokeWidth={2.8} /> : <VolumeX size={20} strokeWidth={2.8} />}
-          <span className="hidden sm:inline">{soundEnabled ? '🎵 Muzik BGM' : '🔇 Bisu'}</span>
+          {bgmOn ? (
+            <Volume2 size={20} strokeWidth={2.8} />
+          ) : sfxOn ? (
+            <Volume2 size={20} strokeWidth={2.8} className="text-amber-800" />
+          ) : (
+            <VolumeX size={20} strokeWidth={2.8} />
+          )}
+          <span className="hidden sm:inline">
+            {bgmOn ? '🎵 Muzik Aktif' : sfxOn ? '🔊 Bunyi Sahaja' : '🔇 Bisu'}
+          </span>
         </button>
+
+        {/* 2 Options Popover Menu */}
+        {showAudioMenu && (
+          <>
+            <div
+              className="fixed inset-0 z-40 bg-black/20"
+              onClick={() => setShowAudioMenu(false)}
+            />
+            <div className="absolute top-12 right-0 z-50 w-72 p-4 rounded-2xl bg-amber-50 border-3 border-amber-600 shadow-2xl animate-fade-in text-slate-900">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b-2 border-amber-200">
+                <span className="font-heading font-black text-sm text-[#78350f]">
+                  Tetapan Bunyi & Muzik
+                </span>
+                <button
+                  onClick={() => setShowAudioMenu(false)}
+                  className="w-6 h-6 rounded-full bg-amber-200 hover:bg-amber-300 text-amber-900 flex items-center justify-center font-bold text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {/* Option 1: Lagu Latar (BGM) */}
+                <div className="p-2.5 rounded-xl bg-white border-2 border-amber-200 shadow-xs flex items-center justify-between gap-2">
+                  <div>
+                    <div className="text-xs font-heading font-black text-slate-900 flex items-center gap-1">
+                      <span>🎵</span>
+                      <span>Lagu Latar</span>
+                    </div>
+                    <span className="text-[10px] text-slate-500 block leading-tight">
+                      Muzik santun permainan
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleToggleBgm}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-heading font-black transition-all cursor-pointer ${
+                      bgmOn
+                        ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-xs'
+                        : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                    }`}
+                  >
+                    {bgmOn ? 'Tutup Lagu' : 'Buka Lagu'}
+                  </button>
+                </div>
+
+                {/* Option 2: Kesan Bunyi (SFX) */}
+                <div className="p-2.5 rounded-xl bg-white border-2 border-amber-200 shadow-xs flex items-center justify-between gap-2">
+                  <div>
+                    <div className="text-xs font-heading font-black text-slate-900 flex items-center gap-1">
+                      <span>🔊</span>
+                      <span>Kesan Bunyi</span>
+                    </div>
+                    <span className="text-[10px] text-slate-500 block leading-tight">
+                      Klik butang dan syiling
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleToggleSfx}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-heading font-black transition-all cursor-pointer ${
+                      sfxOn
+                        ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-xs'
+                        : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                    }`}
+                  >
+                    {sfxOn ? 'Tutup Bunyi' : 'Buka Bunyi'}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowAudioMenu(false)}
+                className="mt-3 w-full py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-heading font-bold text-xs shadow-xs cursor-pointer"
+              >
+                Tutup
+              </button>
+            </div>
+          </>
+        )}
 
         {onHelp && (
           <button
@@ -78,9 +192,9 @@ export const TopNavBar: React.FC<{
               sound.playClick();
               onHelp();
             }}
-            aria-label="Bantuan & Makna Simbol"
-            title="Bantuan & Makna Simbol"
-            className="w-11 h-11 rounded-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-white flex items-center justify-center shadow-lg border-2 border-white transition-all transform hover:scale-105"
+            aria-label="Bantuan dan Makna Simbol"
+            title="Bantuan dan Makna Simbol"
+            className="w-11 h-11 rounded-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-white flex items-center justify-center shadow-lg border-2 border-white transition-all transform hover:scale-105 cursor-pointer"
           >
             <HelpCircle size={26} strokeWidth={3} />
           </button>

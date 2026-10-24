@@ -1734,6 +1734,7 @@ export default function App() {
         {currentScreen === 'game_frog' && (
           <FrogGame
             onBack={() => setCurrentScreen('quiz_menu')}
+            onHome={() => setCurrentScreen('home')}
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
             onComplete={(finalScore, coins) => {
@@ -1748,6 +1749,7 @@ export default function App() {
         {currentScreen === 'game_treasure' && (
           <TreasureGame
             onBack={() => setCurrentScreen('quiz_menu')}
+            onHome={() => setCurrentScreen('home')}
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
             onComplete={(finalScore, coins) => {
@@ -1762,6 +1764,7 @@ export default function App() {
         {currentScreen === 'game_mario' && (
           <MarioGame
             onBack={() => setCurrentScreen('quiz_menu')}
+            onHome={() => setCurrentScreen('home')}
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
             onComplete={(finalScore, coins) => {
@@ -1777,6 +1780,7 @@ export default function App() {
         {currentScreen === 'game_pacman' && (
           <PacmanGame
             onBack={() => setCurrentScreen('quiz_menu')}
+            onHome={() => setCurrentScreen('home')}
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
             onComplete={(finalScore, coins) => {

@@ -31,9 +31,9 @@ export const TEACHER_PROFILES: Record<TeacherId, TeacherProfile> = {
   syafiqah: {
     id: 'syafiqah',
     nama: 'Cikgu Syafiqah',
-    gelaran: 'Pakar Pedagogi PdP',
-    peranan: 'Guru Bahasa Melayu Tahun 5 & Pakar Pedagogi PdP',
-    kepakaran: 'Ayat Silaan, Ayat Permintaan & Kesantunan Bahasa',
+    gelaran: '',
+    peranan: 'Guru Bahasa Melayu Tahun 5',
+    kepakaran: 'Ayat Silaan dan Ayat Permintaan',
     fotoUrl: '/assets/aistudio/cikgu_syafiqah_avatar_clean.png',
     avatarUrl: '/assets/aistudio/cikgu_syafiqah_avatar_clean.png',
     fullGraphicUrl: '/assets/aistudio/cikgu_syafiqah_clean.png',
@@ -54,9 +54,9 @@ export const TEACHER_PROFILES: Record<TeacherId, TeacherProfile> = {
   aaron: {
     id: 'aaron',
     nama: 'Cikgu Aaron',
-    gelaran: 'Guru Bahasa Melayu',
-    peranan: 'Guru Bahasa Melayu Tahun 5 & Pakar Ayat Suruhan',
-    kepakaran: 'Ayat Suruhan, Struktur Ayat & Tatabahasa Baku',
+    gelaran: '',
+    peranan: 'Guru Bahasa Melayu Tahun 5',
+    kepakaran: 'Ayat Suruhan dan Tatabahasa Baku',
     fotoUrl: '/assets/aistudio/cikgu_aaron_avatar_clean.png',
     avatarUrl: '/assets/aistudio/cikgu_aaron_avatar_clean.png',
     fullGraphicUrl: '/assets/aistudio/cikgu_aaron_clean.png',
@@ -77,9 +77,9 @@ export const TEACHER_PROFILES: Record<TeacherId, TeacherProfile> = {
   freshcy: {
     id: 'freshcy',
     nama: 'Cikgu Freshcy',
-    gelaran: 'Inovator Digital PdP',
-    peranan: 'Guru Bahasa Melayu Tahun 5 & Inovator Digital PdP',
-    kepakaran: 'Ayat Larangan, Aktiviti Interaktif & Gamifikasi',
+    gelaran: '',
+    peranan: 'Guru Bahasa Melayu Tahun 5',
+    kepakaran: 'Ayat Larangan dan Gamifikasi',
     fotoUrl: '/assets/aistudio/cikgu_freshcy_avatar_clean.png',
     avatarUrl: '/assets/aistudio/cikgu_freshcy_avatar_clean.png',
     fullGraphicUrl: '/assets/aistudio/cikgu_freshcy_clean.png',
@@ -357,16 +357,10 @@ export const TeacherTrioShowcase: React.FC<{
 
               {/* Bio & Details */}
               <div className="mt-2 w-full">
-                <h4 className="text-sm font-heading font-black text-slate-900 flex items-center justify-center gap-1.5">
+                <h4 className="text-sm font-heading font-black text-slate-900 flex items-center justify-center gap-1.5 my-1">
                   <TeacherAvatar teacherId={id} size="sm" withBorder={false} />
                   <span>{profile.nama}</span>
                 </h4>
-                <p className="text-[11px] font-bold text-amber-800 leading-tight mt-0.5">
-                  {profile.gelaran}
-                </p>
-                <p className="text-[10px] text-slate-600 mt-1 line-clamp-2">
-                  {profile.kepakaran}
-                </p>
 
                 {/* Explicit Audio Voice Preview Button */}
                 <button
