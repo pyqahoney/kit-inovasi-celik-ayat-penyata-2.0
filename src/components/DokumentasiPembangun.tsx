@@ -417,7 +417,7 @@ class _ARPerintahScreenState extends State<ARPerintahScreen> {
                 Rangka Kerja Aliran UI/UX Pengguna (User Flow Architecture)
               </h3>
               <p className="text-slate-300 text-xs">
-                Aplikasi ini direka bentuk mengikut fitrah psikologi kanak-kanak sekolah rendah (Tahun 3 hingga Tahun 5) yang memerlukan navigasi visual berbentuk papan tanda kayu, karakter sahabat haiwan/cikgu, maklum balas audio dwibahasa, serta butang besar tanpa kekusutan (Zero-Pill discipline).
+                Aplikasi ini direka bentuk mengikut fitrah psikologi kanak-kanak sekolah rendah (Tahun 3 hingga Tahun 5) yang memerlukan navigasi visual berbentuk papan tanda kayu, karakter sahabat haiwan/cikgu, maklum balas audio dwibahasa serta butang besar tanpa kekusutan (Zero-Pill discipline).
               </p>
             </div>
 
@@ -430,7 +430,7 @@ class _ARPerintahScreenState extends State<ARPerintahScreen> {
                 <ul className="space-y-1 text-slate-300">
                   <li>• <strong>Skrin 1 (Selamat Datang)</strong>: Muka hadapan bertajuk Ayat Perintah Tahun 5, maskot Cikgu Aina, butang Play Emas bulat.</li>
                   <li>• <strong>Skrin 2 (Semakan Perasaan)</strong>: "Apakah perasaan anda hari ini?" (Gembira 😊 / Sedih 😢) untuk kesediaan belajar Trialogikal.</li>
-                  <li>• <strong>Skrin 3 (Makna Simbol)</strong>: Papan kayu panduan butang Keluar (X), Halaman Utama (Home), Bantuan (?), Audio, dan Panah Kayu.</li>
+                  <li>• <strong>Skrin 3 (Makna Simbol)</strong>: Papan kayu panduan butang Keluar (X), Halaman Utama (Home), Bantuan (?), Audio dan Panah Kayu.</li>
                   <li>• <strong>Skrin 4 (Halaman Utama)</strong>: Papan tanda simpang 3 (Pengenalan, Jom Belajar, Kuiz).</li>
                 </ul>
               </div>
@@ -463,7 +463,7 @@ class _ARPerintahScreenState extends State<ARPerintahScreen> {
                 </span>
                 <ul className="space-y-1 text-slate-300">
                   <li>• <strong>Studio Penciptaan Artifak</strong>: Murid mereka bentuk poster peraturan & kad jemputan nyata untuk mencapai TP6.</li>
-                  <li>• <strong>Papan Pemuka PBS</strong>: Sistem auto-kiraan TP1-TP6, graf analisis, dan butang muat turun CSV SPPB KPM.</li>
+                  <li>• <strong>Papan Pemuka PBS</strong>: Sistem auto-kiraan TP1-TP6, graf analisis dan butang muat turun CSV SPPB KPM.</li>
                 </ul>
               </div>
             </div>
@@ -549,7 +549,7 @@ class _ARPerintahScreenState extends State<ARPerintahScreen> {
               <div className="p-3 rounded-xl bg-slate-800 border-l-4 border-emerald-500">
                 <span className="font-bold text-white block">TP6 (Cemerlang & Teladan)</span>
                 <p className="text-slate-400 mt-1">
-                  Skor kuiz ≥ 85%, tamat kedua-dua permainan (Katak + Harta Karun), cipta ≥ 2 artifak trialogikal, dan imbas ≥ 2 kad AR.
+                  Skor kuiz ≥ 85%, tamat kedua-dua permainan (Katak + Harta Karun), cipta ≥ 2 artifak trialogikal dan imbas ≥ 2 kad AR.
                 </p>
               </div>
 

@@ -6,7 +6,8 @@ import {
   ArrowDown,
   Flame,
   Gamepad2,
-  BookOpen
+  BookOpen,
+  RotateCcw
 } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { TopNavBar, WoodArrowButton } from './OrganicNav';
@@ -119,6 +120,13 @@ interface Ghost {
   color: string;
 }
 
+const INITIAL_GHOSTS: Ghost[] = [
+  { id: 'blinky', name: 'Blinky', x: 6, y: 5, dx: 1, dy: 0, color: '#ef4444' },
+  { id: 'pinky', name: 'Pinky', x: 7, y: 5, dx: -1, dy: 0, color: '#ec4899' },
+  { id: 'inky', name: 'Inky', x: 8, y: 5, dx: 0, dy: -1, color: '#06b6d4' },
+  { id: 'clyde', name: 'Clyde', x: 7, y: 4, dx: 0, dy: 1, color: '#f97316' }
+];
+
 export const PacmanGame: React.FC<PacmanGameProps> = ({
   onBack,
   onHome,
@@ -136,12 +144,7 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
     y: 7,
     dir: 'right'
   });
-  const [ghosts, setGhosts] = useState<Ghost[]>([
-    { id: 'blinky', name: 'Blinky', x: 6, y: 5, dx: 1, dy: 0, color: '#ef4444' },
-    { id: 'pinky', name: 'Pinky', x: 7, y: 5, dx: -1, dy: 0, color: '#ec4899' },
-    { id: 'inky', name: 'Inky', x: 8, y: 5, dx: 0, dy: -1, color: '#06b6d4' },
-    { id: 'clyde', name: 'Clyde', x: 7, y: 4, dx: 0, dy: 1, color: '#f97316' }
-  ]);
+  const [ghosts, setGhosts] = useState<Ghost[]>(() => INITIAL_GHOSTS.map((g) => ({ ...g })));
   const [score, setScore] = useState(0);
   const [coins, setCoins] = useState(0);
   const [lives, setLives] = useState(3);
@@ -365,6 +368,23 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
     return () => clearInterval(interval);
   }, [grid, pacman, activeChallenge, stageFinished, answeredCount]);
 
+  const handleRestartGame = () => {
+    sound.playClick();
+    setIsGameOver(false);
+    setStageFinished(false);
+    setScore(0);
+    setCoins(0);
+    setLives(3);
+    setAnsweredCount(0);
+    setScaredTimer(0);
+    setActiveChallenge(null);
+    setFeedback(null);
+    setGrid(MAZE_GRID.map((r) => [...r]));
+    setPacman({ x: 7, y: 7, dir: 'right' });
+    setGhosts(INITIAL_GHOSTS.map((g) => ({ ...g })));
+    nextDirRef.current = 'right';
+  };
+
   const handlePacmanGhostCollision = useCallback((ghost: Ghost) => {
     if (scaredTimer > 0) {
       // Pacman eats ghost!
@@ -381,9 +401,9 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
       setLives((l) => {
         const nextLives = l - 1;
         if (nextLives <= 0) {
-          // Restart position
-          setPacman({ x: 7, y: 7, dir: 'right' });
-          return 3;
+          setIsGameOver(true);
+          sound.playWrong();
+          return 0;
         }
         setPacman({ x: 7, y: 7, dir: 'right' });
         return nextLives;
@@ -471,7 +491,7 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
                 Misi Labirin: Ayat Perintah
               </span>
               <p className="text-slate-200 text-sm sm:text-base font-semibold mt-3 leading-relaxed">
-                Kembara Labirin Ayat Perintah bersama Pac-Man! Makan bintik kuasa untuk membuka cabaran tatabahasa, tewaskan hantu nakal, dan kuasai 4 jenis ayat perintah!
+                Kembara Labirin Ayat Perintah bersama Pac-Man! Makan bintik kuasa untuk membuka cabaran tatabahasa, tewaskan hantu nakal dan kuasai 4 jenis ayat perintah!
               </p>
             </div>
 
@@ -896,6 +916,40 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
         </div>
       )}
 
+      {/* POPUP KEKALAHAN: Murid Kalah & Perlu Ulang Semula Permainan */}
+      {isGameOver && (
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="relative max-w-md w-full bg-slate-900 rounded-3xl border-4 border-rose-500 shadow-2xl p-6 text-center text-white">
+            <div className="w-20 h-20 mx-auto -mt-12 bg-rose-500 rounded-3xl border-4 border-white shadow-xl flex items-center justify-center text-4xl animate-bounce">
+              💔
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-heading font-black text-rose-400 mt-3">
+              Permainan Tamat!
+            </h2>
+            <p className="text-sm text-slate-200 font-bold mt-2">
+              Pac-Man telah kehabisan semua nyawa! Kamu kalah dalam misi labirin ini.
+            </p>
+            <p className="text-xs text-rose-300 mt-1">
+              Jangan berputus asa! Mari ulang semula permainan untuk menguasai ayat perintah.
+            </p>
+
+            <div className="p-3 bg-slate-800 rounded-2xl border-2 border-rose-500/50 my-4 text-center">
+              <span className="text-[11px] font-bold text-slate-400 uppercase block">Skor Terkumpul</span>
+              <span className="text-2xl font-black text-white">{score} Mata</span>
+            </div>
+
+            <button
+              onClick={handleRestartGame}
+              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-heading font-black text-base shadow-[0_4px_0_#9f1239] active:translate-y-1 transition-all flex items-center justify-center gap-2"
+            >
+              <RotateCcw size={20} />
+              <span>Ulang Semula Permainan</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* POPUP VICTORY: Tahniah & Penamat Pengembaraan Pac-Man */}
       {stageFinished && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
@@ -914,7 +968,7 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
             <div className="grid grid-cols-2 gap-3 my-4">
               <div className="p-3 bg-slate-800 rounded-2xl border-2 border-yellow-500/50">
                 <span className="text-[10px] font-bold text-yellow-300 uppercase block">Markah Pac-Man</span>
-                <span className="text-2xl font-black text-white">{score} PTS</span>
+                <span className="text-2xl font-black text-white">{score} Mata</span>
               </div>
               <div className="p-3 bg-slate-800 rounded-2xl border-2 border-yellow-500/50">
                 <span className="text-[10px] font-bold text-yellow-300 uppercase block">Syiling Emas</span>
@@ -931,21 +985,12 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
                 }}
                 className="w-full py-3 rounded-2xl bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 font-heading font-black text-sm shadow-[0_4px_0_#b45309] active:translate-y-1 transition-all flex items-center justify-center gap-2"
               >
-                <span>Selesai & Simpan Markah PBS</span>
+                <span>Selesai & Simpan Rekod PBD</span>
                 <span>🏆</span>
               </button>
 
               <button
-                onClick={() => {
-                  setStageFinished(false);
-                  setScore(0);
-                  setCoins(0);
-                  setLives(3);
-                  setAnsweredCount(0);
-                  setGrid(MAZE_GRID.map((r) => [...r]));
-                  setPacman({ x: 7, y: 7, dir: 'right' });
-                  sound.playClick();
-                }}
+                onClick={handleRestartGame}
                 className="w-full py-2 text-xs font-bold text-yellow-300/80 hover:text-yellow-300 underline"
               >
                 Main Semula Labirin Ini

@@ -3,7 +3,7 @@ import { TopNavBar, WoodArrowButton, AudioSpeakerButton } from './OrganicNav';
 import { CikguVector, CatVector } from './IllustratedCharacters';
 import { MotherAndDaughterVector, PolarBearAndBoardCat, EmotiveShapeMascot, BlueBirdVector } from './StoryGraphics';
 import { Play, Pause, RotateCcw, Sparkles, Volume2, BookOpen } from 'lucide-react';
-import { sound } from '../utils/audio';
+import { sound, CIKGU_FRESHCY_AUDIOS } from '../utils/audio';
 import { TeaterDramaVideo } from './TeaterDramaVideo';
 
 interface NotaDanVideoProps {
@@ -341,7 +341,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
               <div className="flex items-center justify-between mb-1">
                 <span className="font-heading font-bold text-sm sm:text-base text-rose-900">Kata larangan</span>
                 <div className="flex items-center gap-1">
-                  <AudioSpeakerButton textToSpeak="Kata larangan: jangan, usah." size="sm" />
+                  <AudioSpeakerButton textToSpeak="Kata larangan seperti jangan dan usah menegah sesuatu perbuatan yang tidak selamat." size="sm" />
                   <EmotiveShapeMascot shape="circle" size={42} />
                 </div>
               </div>
@@ -387,13 +387,16 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
           <div className="space-y-3 max-w-3xl mx-auto w-full">
             {/* Kategori 1: Kata Larangan */}
             <div className="p-3 rounded-2xl bg-rose-50/90 border-2 border-rose-300 shadow-sm">
-              <div className="flex items-center gap-2 mb-2 pb-1 border-b border-rose-200">
-                <span className="px-2.5 py-0.5 rounded-full bg-rose-600 text-white font-heading font-black text-xs uppercase tracking-wider">
-                  🚫 Kategori: Kata Larangan
-                </span>
-                <span className="text-[11px] text-rose-800 font-semibold">
-                  (Menegah atau melarang sesuatu perbuatan)
-                </span>
+              <div className="flex items-center justify-between mb-2 pb-1 border-b border-rose-200">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-rose-600 text-white font-heading font-black text-xs uppercase tracking-wider">
+                    🚫 Kategori: Kata Larangan
+                  </span>
+                  <span className="text-[11px] text-rose-800 font-semibold">
+                    (Menegah atau melarang sesuatu perbuatan)
+                  </span>
+                </div>
+                <AudioSpeakerButton textToSpeak="Kata larangan seperti jangan dan usah menegah sesuatu perbuatan yang tidak selamat." size="sm" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[

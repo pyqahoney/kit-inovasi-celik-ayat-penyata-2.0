@@ -6,6 +6,34 @@
 const NINTENDO_CAFE_BGM_URL =
   '/assets/aistudio/Relaxing_Nintendo_Caf__Music_Vol_2___Studying__Chill__Jazz__Bossa_Nova__1__68c5c980.mp3';
 
+/**
+ * Audio Rakaman Suara Cikgu Freshcy yang Sebenar
+ */
+export const CIKGU_FRESHCY_AUDIOS = {
+  // Latih Diri Intros
+  arIntro: '/assets/aistudio/Anda_memilih_mod_AR_2f8f3cde.ogg',
+  oralIntro: '/assets/aistudio/Anda_memilih_mod_mendengar_dan_bertutur_fde3eea4.ogg',
+  writtenIntro: '/assets/aistudio/Sila_pilih_jawapan_yang_paling_d46dab97.ogg',
+
+  // Latih Diri Soalan 1 - 5
+  soalan1: '/assets/aistudio/Soalan_1_6af4b487.ogg',
+  soalan2: '/assets/aistudio/Soalan_2_1c0d8977.ogg',
+  soalan3: '/assets/aistudio/Soalan_3_4fa444a9.ogg',
+  soalan4: '/assets/aistudio/Soalan_4_55514064.ogg',
+  soalan5: '/assets/aistudio/Soalan_5_cdaaada7.ogg',
+
+  // Dialog & Panduan Halaman
+  welcome: '/assets/aistudio/HAI_SAYA_CIKGU_FRESHCY_0282d3b0.ogg',
+  emotion: '/assets/aistudio/Hai_Cikgu_Nak_Tanya_6dd92a8f.ogg',
+  symbols: '/assets/aistudio/Fahami_6_makna_simbol_ini_578d3b61.ogg',
+  home: '/assets/aistudio/Sila_tekan_butang_pengenalan_684cc0a1.ogg',
+  standard: '/assets/aistudio/Mari_kita_fahami_standard_8aac2a0a.ogg',
+  sasaran: '/assets/aistudio/Sasaran_kita__kuasai_ayat_perintah_083ad221.ogg',
+  learnMenu: '/assets/aistudio/Sila_pilih_bahagian_yang_ingin_anda_terokai_bersama_cikgu_Freshcy_207ed76d.ogg',
+  quizMenu: '/assets/aistudio/Pilih_permainan_kegemaran_anda_dan_kumpul_sebanyak_mana_syiling_emas_77ef6ef4.ogg',
+  kataLarangan: '/assets/aistudio/Kata_larangan_seperti_jangan_dan_usah_91b420e2.ogg'
+};
+
 class SoundController {
   private audioCtx: AudioContext | null = null;
   public enabled: boolean = true;
@@ -13,6 +41,7 @@ class SoundController {
   public sfxEnabled: boolean = true;
   private audioListeners: Set<(state: { bgmEnabled: boolean; sfxEnabled: boolean }) => void> = new Set();
   private bgmAudio: HTMLAudioElement | null = null;
+  private currentClipAudio: HTMLAudioElement | null = null;
   private isBGMPlaying: boolean = false;
   private isSpeaking: boolean = false;
   private lastClickTimestamp: number = 0;
@@ -22,9 +51,11 @@ class SoundController {
   private readonly NORMAL_BGM_VOLUME = 0.35;
   private readonly DUCKED_BGM_VOLUME = 0.08;
 
-  public onAudioStateChange(fn: (state: { bgmEnabled: boolean; sfxEnabled: boolean }) => void) {
+  public onAudioStateChange(fn: (state: { bgmEnabled: boolean; sfxEnabled: boolean }) => void): () => void {
     this.audioListeners.add(fn);
-    return () => this.audioListeners.delete(fn);
+    return () => {
+      this.audioListeners.delete(fn);
+    };
   }
 
   private notifyAudioListeners() {
@@ -752,14 +783,164 @@ class SoundController {
     this.speechListeners.forEach((fn) => fn(speaking));
   }
 
+  // Helper to match text to Cikgu Freshcy audio files
+  public getFreshcyAudioForText(text: string): string | null {
+    if (!text) return null;
+    const t = text.toLowerCase();
+    if (t.includes('memilih mod ar') || (t.includes('mod ar') && t.includes('emoji'))) {
+      return CIKGU_FRESHCY_AUDIOS.arIntro;
+    }
+    if (
+      t.includes('mod mendengar dan bertutur') ||
+      t.includes('mod lisan') ||
+      (t.includes('mendengar') && t.includes('bertutur'))
+    ) {
+      return CIKGU_FRESHCY_AUDIOS.oralIntro;
+    }
+    if (t.includes('paling tepat bagi setiap soalan') || t.includes('paling tepat')) {
+      return CIKGU_FRESHCY_AUDIOS.writtenIntro;
+    }
+    if (t.includes('soalan 1') || t.includes('soalan satu')) {
+      return CIKGU_FRESHCY_AUDIOS.soalan1;
+    }
+    if (t.includes('soalan 2') || t.includes('soalan dua')) {
+      return CIKGU_FRESHCY_AUDIOS.soalan2;
+    }
+    if (t.includes('soalan 3') || t.includes('soalan tiga')) {
+      return CIKGU_FRESHCY_AUDIOS.soalan3;
+    }
+    if (t.includes('soalan 4') || t.includes('soalan empat')) {
+      return CIKGU_FRESHCY_AUDIOS.soalan4;
+    }
+    if (t.includes('soalan 5') || t.includes('soalan lima')) {
+      return CIKGU_FRESHCY_AUDIOS.soalan5;
+    }
+    if (
+      t.includes('saya cikgu freshcy') ||
+      t.includes('jom belajar ayat perintah bersama cikgu')
+    ) {
+      return CIKGU_FRESHCY_AUDIOS.welcome;
+    }
+    if (
+      t.includes('bagaimana perasaan kamu hari ini') ||
+      t.includes('perasaan kamu hari ini')
+    ) {
+      return CIKGU_FRESHCY_AUDIOS.emotion;
+    }
+    if (
+      t.includes('makna 6 simbol') ||
+      t.includes('makna enam simbol') ||
+      t.includes('makna simbol')
+    ) {
+      return CIKGU_FRESHCY_AUDIOS.symbols;
+    }
+    if (
+      t.includes('butang pengenalan') ||
+      t.includes('jom belajar atau kuiz')
+    ) {
+      return CIKGU_FRESHCY_AUDIOS.home;
+    }
+    if (
+      t.includes('standard kandungan') &&
+      (t.includes('5.3.2') || t.includes('hari ini'))
+    ) {
+      return CIKGU_FRESHCY_AUDIOS.standard;
+    }
+    if (
+      t.includes('sasaran kita') ||
+      t.includes('kuasai 4 jenis') ||
+      t.includes('kuasai empat jenis')
+    ) {
+      return CIKGU_FRESHCY_AUDIOS.sasaran;
+    }
+    if (t.includes('bahagian yang ingin anda terokai')) {
+      return CIKGU_FRESHCY_AUDIOS.learnMenu;
+    }
+    if (
+      t.includes('pilih permainan kegemaran') ||
+      t.includes('syiling emas')
+    ) {
+      return CIKGU_FRESHCY_AUDIOS.quizMenu;
+    }
+    if (
+      t.includes('kata larangan seperti jangan dan usah') ||
+      (t.includes('kata larangan') && t.includes('menegah'))
+    ) {
+      return CIKGU_FRESHCY_AUDIOS.kataLarangan;
+    }
+    return null;
+  }
+
+  // Play an exact recorded audio clip (with audio ducking and speech state notification)
+  public playAudioClip(url: string, onEnd?: () => void): HTMLAudioElement | null {
+    if (!this.enabled || typeof window === 'undefined') return null;
+
+    this.stopSpeech();
+
+    try {
+      this.duckBGM();
+      this.notifySpeechState(true);
+
+      const audio = new Audio(url);
+      this.currentClipAudio = audio;
+      audio.preload = 'auto';
+
+      audio.onended = () => {
+        this.unduckBGM();
+        this.notifySpeechState(false);
+        this.currentClipAudio = null;
+        if (onEnd) onEnd();
+      };
+
+      audio.onerror = () => {
+        this.unduckBGM();
+        this.notifySpeechState(false);
+        this.currentClipAudio = null;
+      };
+
+      audio.play().catch(() => {
+        this.unduckBGM();
+        this.notifySpeechState(false);
+        this.currentClipAudio = null;
+      });
+
+      return audio;
+    } catch {
+      this.unduckBGM();
+      this.notifySpeechState(false);
+      return null;
+    }
+  }
+
+  public stopAudioClip() {
+    if (this.currentClipAudio) {
+      this.currentClipAudio.pause();
+      this.currentClipAudio = null;
+    }
+  }
+
   // Text-to-Speech in Bahasa Melayu Malaysia Baku with humanized intonation & teacher personas
   speakMalay(
     text: string,
-    persona: 'syafiqah' | 'aaron' | 'freshcy' | 'neutral' = 'syafiqah'
+    persona: 'syafiqah' | 'aaron' | 'freshcy' | 'neutral' = 'syafiqah',
+    onEnd?: () => void
   ) {
-    if (!this.enabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    if (!this.enabled || typeof window === 'undefined') return;
+
+    // Check if Cikgu Freshcy has an authentic human audio recording for this sentence
+    if (persona === 'freshcy') {
+      const clip = this.getFreshcyAudioForText(text);
+      if (clip) {
+        this.playAudioClip(clip, onEnd);
+        return;
+      }
+    }
+
+    if (!('speechSynthesis' in window)) return;
     try {
       window.speechSynthesis.cancel();
+      this.stopAudioClip();
+
       const humanized = this.humanizeMalayText(text);
       const utterance = new SpeechSynthesisUtterance(humanized);
 
@@ -785,6 +966,7 @@ class SoundController {
       utterance.onend = () => {
         this.unduckBGM();
         this.notifySpeechState(false);
+        if (onEnd) onEnd();
       };
 
       utterance.onerror = () => {
@@ -827,6 +1009,7 @@ class SoundController {
   }
 
   stopSpeech() {
+    this.stopAudioClip();
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }

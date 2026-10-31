@@ -79,7 +79,7 @@ const LEVEL_1_QUESTIONS: QuestionBlock[] = [
         maklumBalas: 'Kurang tepat, kata "Tolong" menjadikannya ayat permintaan.'
       }
     ],
-    penerangan: 'Kata perintah "Tolong", "Minta", dan "Harap" tergolong dalam Ayat Permintaan.'
+    penerangan: 'Kata perintah "Tolong", "Minta" dan "Harap" tergolong dalam Ayat Permintaan.'
   },
   {
     id: 2,
@@ -329,6 +329,8 @@ export const MarioGame: React.FC<MarioGameProps> = ({
 
   // Level Progression: 1 (Easy 2Q) -> 2 (Intermediate 3Q) -> 3 (Boss Bowser & Princess 4Q)
   const [currentLevel, setCurrentLevel] = useState<1 | 2 | 3>(1);
+  const [maxUnlockedLevel, setMaxUnlockedLevel] = useState<1 | 2 | 3>(1);
+  const [showLevelMap, setShowLevelMap] = useState<boolean>(false);
   const [levelTransitionModal, setLevelTransitionModal] = useState<1 | 2 | null>(null);
 
   // Mario physics & state
@@ -379,6 +381,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
   // Update blocks and world coins when level changes
   const startLevel = (lvl: 1 | 2 | 3) => {
     setCurrentLevel(lvl);
+    setShowLevelMap(false);
     setPosX(60);
     setPosY(GROUND_Y);
     setVelY(0);
@@ -698,11 +701,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
       setTimeout(() => {
         setActiveQuestion(null);
         setFeedback(null);
-
-        // Check if all blocks answered for this level
-        if (updatedBlocks.every((b) => b.answered)) {
-          triggerLevelEnd();
-        }
+        // Do not auto-advance: let Mario walk into the castle door himself!
       }, 2200);
     } else {
       sound.playWrong();
@@ -720,9 +719,11 @@ export const MarioGame: React.FC<MarioGameProps> = ({
   const triggerLevelEnd = () => {
     if (currentLevel === 1) {
       sound.playFanfare();
+      setMaxUnlockedLevel((prev) => Math.max(prev, 2) as 1 | 2 | 3);
       setLevelTransitionModal(1);
     } else if (currentLevel === 2) {
       sound.playFanfare();
+      setMaxUnlockedLevel((prev) => Math.max(prev, 3) as 1 | 2 | 3);
       setLevelTransitionModal(2);
     } else if (currentLevel === 3) {
       // Defeated Boss Bowser -> Rescue Princess Peach!
@@ -752,15 +753,15 @@ export const MarioGame: React.FC<MarioGameProps> = ({
         onToggleSound={onToggleSound}
         onHelp={() =>
           sound.speakMalay(
-            'Gunakan butang kiri, kanan, dan lompat untuk menggerakkan Mario ke blok tanda soal!'
+            'Gunakan butang kiri, kanan dan lompat untuk menggerakkan Mario ke blok tanda soal!'
           )
         }
         title={
           currentLevel === 1
-            ? 'Wira Mario: Level 1 (Ayat Perintah)'
+            ? 'Wira Mario: Tahap 1 (Ayat Perintah)'
             : currentLevel === 2
-            ? 'Wira Mario: Level 2 (Kata Perintah)'
-            : 'Wira Mario: Level 3 (Istana Bos & Princess)'
+            ? 'Wira Mario: Tahap 2 (Kata Perintah)'
+            : 'Wira Mario: Tahap 3 (Istana Raja Musuh & Puteri Peach)'
         }
       />
 
@@ -872,7 +873,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                     4
                   </span>
                   <p>
-                    Lengkapkan <strong>Level 1 (2 Soalan)</strong>, <strong>Level 2 (3 Soalan)</strong>, dan tumpaskan <strong>Bos Bowser di Level 3 (4 Soalan)</strong> untuk membebaskan Princess Peach!
+                    Lengkapkan <strong>Tahap 1 (2 Soalan)</strong>, <strong>Tahap 2 (3 Soalan)</strong> dan tumpaskan <strong>Raja Musuh Bowser di Tahap 3 (4 Soalan)</strong> untuk membebaskan Puteri Peach!
                   </p>
                 </div>
               </div>
@@ -915,7 +916,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                 : 'linear-gradient(to bottom, #5c94fc 0%, #6ba5fc 70%, #90c0fc 100%)'
           }}
         >
-          {/* Retro Status HUD Header (Score, Coins, Level, Boss HP, Lives) */}
+          {/* Retro Status HUD Header (Skor, Syiling, Tahap, Boss HP, Nyawa) */}
           <div className="relative z-30 bg-black/80 backdrop-blur-sm px-3 sm:px-4 py-2 flex items-center justify-between text-white font-mono text-xs sm:text-sm border-b-2 border-amber-400">
             <div className="flex items-center gap-1.5 font-bold text-amber-300">
               <span>MARIO</span>
@@ -927,20 +928,34 @@ export const MarioGame: React.FC<MarioGameProps> = ({
               <span>× {coins}</span>
             </div>
 
-            {/* Level Indicator Pill */}
-            <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-slate-900 border border-amber-400 font-heading font-black text-xs">
-              <span className="text-yellow-400">DUNIA 1 - {currentLevel}</span>
-              {currentLevel === 3 && (
-                <span className="bg-red-600 text-white text-[10px] px-1.5 py-0.2 rounded-full uppercase tracking-wider animate-pulse flex items-center gap-0.5">
-                  <Flame size={12} /> LEVEL BOS
-                </span>
-              )}
+            {/* Level Indicator & Map Button */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-slate-900 border border-amber-400 font-heading font-black text-xs">
+                <span className="text-yellow-400">DUNIA 1 - {currentLevel}</span>
+                {currentLevel === 3 && (
+                  <span className="bg-red-600 text-white text-[10px] px-1.5 py-0.2 rounded-full uppercase tracking-wider animate-pulse flex items-center gap-0.5">
+                    <Flame size={12} /> RAJA MUSUH
+                  </span>
+                )}
+              </div>
+
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setShowLevelMap(true);
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-heading font-black text-xs shadow-[0_2px_0_#b45309] active:translate-y-0.5 transition-all cursor-pointer"
+                title="Buka Peta Tahap Mario"
+              >
+                <span>🗺️</span>
+                <span className="hidden sm:inline">Peta Tahap</span>
+              </button>
             </div>
 
             {/* Level 3 Boss HP Bar */}
             {currentLevel === 3 && (
               <div className="hidden sm:flex items-center gap-1.5 bg-red-950/90 px-3 py-1 rounded-xl border border-red-500">
-                <span className="text-[11px] font-heading font-black text-red-300">BOS BOWSER HP:</span>
+                <span className="text-[11px] font-heading font-black text-red-300">HP BOWSER:</span>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4].map((bar) => (
                     <div
@@ -965,6 +980,15 @@ export const MarioGame: React.FC<MarioGameProps> = ({
             className="relative flex-1 overflow-hidden transition-transform duration-75 ease-out"
             style={{ width: '100%', height: '100%' }}
           >
+            {/* Banner Panduan Masuk Istana apabila semua soalan selesai */}
+            {blocks.every((b) => b.answered) && !stageFinished && !levelTransitionModal && (
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 z-40 bg-gradient-to-r from-emerald-600 via-amber-500 to-emerald-600 text-white font-heading font-black text-xs sm:text-sm px-4 py-1.5 rounded-2xl border-2 border-white shadow-2xl flex items-center gap-2 animate-bounce pointer-events-none text-center">
+                <span>🏰</span>
+                <span>PINTU ISTANA TERBUKA! Bimbing Mario masuk ke pintu istana (🚪) untuk mara!</span>
+                <span>➔</span>
+              </div>
+            )}
+
             <div
               className="absolute top-0 bottom-0 flex"
               style={{
@@ -1100,11 +1124,19 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                     </div>
                     <span className="text-2xl mt-3">🏰</span>
                     <span className="text-[10px] font-heading font-black text-amber-200 mt-1 uppercase tracking-wider">
-                      {currentLevel === 1 ? 'Istana Level 1' : 'Pintu Istana Bos'}
+                      {currentLevel === 1 ? 'Istana Tahap 1' : 'Pintu Istana Bos'}
                     </span>
-                    <div className="absolute bottom-0 w-10 h-14 bg-black rounded-t-full border-t-2 border-amber-500 flex items-center justify-center">
-                      {!blocks.every((b) => b.answered) && (
+                    <div
+                      className={`absolute bottom-0 w-10 h-14 bg-black rounded-t-full border-t-2 ${
+                        blocks.every((b) => b.answered)
+                          ? 'border-yellow-300 shadow-[0_0_15px_#fde047]'
+                          : 'border-amber-500'
+                      } flex items-center justify-center`}
+                    >
+                      {!blocks.every((b) => b.answered) ? (
                         <span className="text-base animate-pulse">🔒</span>
+                      ) : (
+                        <span className="text-base animate-bounce">🚪✨</span>
                       )}
                     </div>
                   </div>
@@ -1444,6 +1476,171 @@ export const MarioGame: React.FC<MarioGameProps> = ({
         </div>
       )}
 
+      {/* PETA LEVEL MARIO (Dunia Pengembaraan Ayat Perintah) */}
+      {showLevelMap && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="relative max-w-xl w-full bg-gradient-to-b from-sky-400 via-emerald-600 to-amber-900 rounded-3xl border-4 border-amber-400 shadow-2xl p-5 sm:p-6 text-white overflow-hidden">
+            {/* Retro Map Header */}
+            <div className="flex items-center justify-between border-b-2 border-white/30 pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-3xl animate-bounce">🗺️</span>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-heading font-black text-yellow-300 drop-shadow">
+                    PETA TAHAP MARIO
+                  </h2>
+                  <p className="text-xs text-white/90 font-bold">
+                    Dunia 1: Pengembaraan Ayat Perintah
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowLevelMap(false)}
+                className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center font-black text-sm border border-white/40 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Map Path & Levels */}
+            <div className="relative my-3 p-4 rounded-2xl bg-black/45 backdrop-blur-sm border-2 border-amber-300/60">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative z-10">
+                {/* Node 1: Tahap 1 */}
+                <div
+                  className={`p-3.5 rounded-2xl border-3 flex flex-col items-center text-center transition-all ${
+                    currentLevel === 1
+                      ? 'bg-amber-500/90 border-yellow-200 ring-4 ring-yellow-400 shadow-lg scale-102'
+                      : 'bg-slate-900/90 border-emerald-400'
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500 border-2 border-white flex items-center justify-center text-2xl mb-2 shadow">
+                    🍄
+                  </div>
+                  <span className="text-xs font-heading font-black text-yellow-300 uppercase">
+                    Tahap 1
+                  </span>
+                  <p className="text-xs font-bold text-white mt-0.5">
+                    Padang Rumput
+                  </p>
+                  <span className="text-[10px] text-emerald-200 mt-0.5">
+                    Kenal Pasti Jenis Ayat
+                  </span>
+                  <div className="mt-3 w-full">
+                    <button
+                      onClick={() => {
+                        setShowLevelMap(false);
+                        if (currentLevel !== 1) startLevel(1);
+                      }}
+                      className="w-full py-1.5 px-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-heading font-black text-xs shadow transition-all active:translate-y-0.5 cursor-pointer"
+                    >
+                      {currentLevel === 1 ? 'Sedang Main' : 'Main Tahap 1'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Node 2: Tahap 2 */}
+                <div
+                  className={`p-3.5 rounded-2xl border-3 flex flex-col items-center text-center transition-all ${
+                    maxUnlockedLevel < 2
+                      ? 'bg-slate-950/70 border-slate-700 opacity-60'
+                      : currentLevel === 2
+                      ? 'bg-amber-500/90 border-yellow-200 ring-4 ring-yellow-400 shadow-lg scale-102'
+                      : 'bg-slate-900/90 border-blue-400'
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-blue-500 border-2 border-white flex items-center justify-center text-2xl mb-2 shadow">
+                    {maxUnlockedLevel < 2 ? '🔒' : '🌿'}
+                  </div>
+                  <span className="text-xs font-heading font-black text-yellow-300 uppercase">
+                    Tahap 2
+                  </span>
+                  <p className="text-xs font-bold text-white mt-0.5">
+                    Lembah Kata Perintah
+                  </p>
+                  <span className="text-[10px] text-blue-200 mt-0.5">
+                    Lengkapkan Kata Perintah
+                  </span>
+                  <div className="mt-3 w-full">
+                    {maxUnlockedLevel >= 2 ? (
+                      <button
+                        onClick={() => {
+                          setShowLevelMap(false);
+                          if (currentLevel !== 2) startLevel(2);
+                        }}
+                        className="w-full py-1.5 px-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white font-heading font-black text-xs shadow transition-all active:translate-y-0.5 cursor-pointer"
+                      >
+                        {currentLevel === 2 ? 'Sedang Main' : 'Main Tahap 2'}
+                      </button>
+                    ) : (
+                      <span className="inline-block py-1 px-2 rounded-lg bg-black/60 text-slate-400 text-[11px] font-bold">
+                        Selesaikan Tahap 1
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Node 3: Tahap 3 (Istana Raja Bowser) */}
+                <div
+                  className={`p-3.5 rounded-2xl border-3 flex flex-col items-center text-center transition-all ${
+                    maxUnlockedLevel < 3
+                      ? 'bg-slate-950/70 border-slate-700 opacity-60'
+                      : currentLevel === 3
+                      ? 'bg-amber-500/90 border-yellow-200 ring-4 ring-yellow-400 shadow-lg scale-102'
+                      : 'bg-slate-900/90 border-red-500'
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-red-600 border-2 border-white flex items-center justify-center text-2xl mb-2 shadow">
+                    {maxUnlockedLevel < 3 ? '🔒' : '🏰'}
+                  </div>
+                  <span className="text-xs font-heading font-black text-yellow-300 uppercase">
+                    Tahap 3
+                  </span>
+                  <p className="text-xs font-bold text-white mt-0.5">
+                    Istana Raja Bowser
+                  </p>
+                  <span className="text-[10px] text-red-200 mt-0.5">
+                    Selamatkan Puteri Peach
+                  </span>
+                  <div className="mt-3 w-full">
+                    {maxUnlockedLevel >= 3 ? (
+                      <button
+                        onClick={() => {
+                          setShowLevelMap(false);
+                          if (currentLevel !== 3) startLevel(3);
+                        }}
+                        className="w-full py-1.5 px-2 rounded-xl bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-heading font-black text-xs shadow transition-all active:translate-y-0.5 cursor-pointer"
+                      >
+                        {currentLevel === 3 ? 'Sedang Main' : 'Lawan Bowser'}
+                      </button>
+                    ) : (
+                      <span className="inline-block py-1 px-2 rounded-lg bg-black/60 text-slate-400 text-[11px] font-bold">
+                        Selesaikan Tahap 2
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom info & Close button */}
+            <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/20">
+              <div className="flex items-center gap-3 text-xs font-bold text-amber-200">
+                <span>Skor: {score} Mata</span>
+                <span>•</span>
+                <span>Syiling: {coins} 🪙</span>
+                <span>•</span>
+                <span>Nyawa: {lives} ❤️</span>
+              </div>
+              <button
+                onClick={() => setShowLevelMap(false)}
+                className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white font-heading font-black text-xs transition-all cursor-pointer"
+              >
+                Tutup Peta
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* LEVEL TRANSITION 1 -> 2 MODAL */}
       {levelTransitionModal === 1 && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
@@ -1452,20 +1649,32 @@ export const MarioGame: React.FC<MarioGameProps> = ({
               ⭐
             </div>
             <h2 className="text-2xl sm:text-3xl font-heading font-black text-slate-900 mt-3">
-              Tahniah! Level 1 Berjaya!
+              Tahniah! Tahap 1 Berjaya!
             </h2>
             <p className="text-xs sm:text-sm text-emerald-700 font-bold mt-1">
-              Kedua-dua soalan mengenal pasti jenis ayat perintah telah dijawab dengan cemerlang!
+              Mario telah berjaya memasuki istana setelah menjawab semua soalan dengan tepat!
             </p>
             <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 my-4 text-xs font-bold text-slate-700">
-              Seterusnya: <strong>Level 2 (3 Soalan)</strong> – Lengkapkan ayat perintah menggunakan kata perintah yang betul!
+              Seterusnya: <strong>Tahap 2 (3 Soalan)</strong> – Lengkapkan ayat perintah menggunakan kata perintah yang betul!
             </div>
-            <button
-              onClick={() => startLevel(2)}
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-heading font-black text-sm shadow-[0_4px_0_#0f766e] active:translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>Masuk ke Level 2 ➔</span>
-            </button>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => startLevel(2)}
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-heading font-black text-sm shadow-[0_4px_0_#0f766e] active:translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Masuk ke Tahap 2 ➔</span>
+              </button>
+              <button
+                onClick={() => {
+                  setLevelTransitionModal(null);
+                  setShowLevelMap(true);
+                }}
+                className="w-full py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-heading font-black text-xs border border-slate-300 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span>🗺️</span>
+                <span>Buka Peta Tahap Mario</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1478,24 +1687,36 @@ export const MarioGame: React.FC<MarioGameProps> = ({
               🔥
             </div>
             <h2 className="text-2xl sm:text-3xl font-heading font-black text-red-400 mt-3">
-              AMARAN: LEVEL BOS MENANTI!
+              AMARAN: TAHAP RAJA MUSUH MENANTI!
             </h2>
             <p className="text-xs sm:text-sm text-amber-200 font-bold mt-1">
-              Bos Bowser telah menculik Princess Peach di Istana Berapi!
+              Mario telah mara ke pintu kubu Raja Musuh Bowser! Puteri Peach menanti pertolonganmu!
             </p>
             <div className="p-3 bg-red-950/80 rounded-2xl border border-red-600 my-4 text-xs font-semibold text-slate-200 text-left space-y-1">
-              <p className="font-bold text-amber-300">Misi Selamatkan Princess:</p>
+              <p className="font-bold text-amber-300">Misi Selamatkan Puteri:</p>
               <p>• Selesaikan 4 soalan tatabahasa ayat perintah.</p>
-              <p>• Kenal pasti jenis ayat & mana satu yang BUKAN ayat suruhan.</p>
-              <p>• Setiap jawapan tepat akan menewaskan Bos Bowser!</p>
+              <p>• Kenal pasti jenis ayat dan mana satu yang BUKAN ayat suruhan.</p>
+              <p>• Setiap jawapan tepat akan menewaskan Raja Musuh Bowser!</p>
             </div>
-            <button
-              onClick={() => startLevel(3)}
-              className="w-full py-3 rounded-2xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white font-heading font-black text-sm shadow-[0_4px_0_#7f1d1d] active:translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Flame size={18} />
-              <span>Lawan Bos & Selamatkan Princess! 👸🏼</span>
-            </button>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => startLevel(3)}
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white font-heading font-black text-sm shadow-[0_4px_0_#7f1d1d] active:translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Flame size={18} />
+                <span>Lawan Raja Musuh & Selamatkan Puteri! 👸🏼</span>
+              </button>
+              <button
+                onClick={() => {
+                  setLevelTransitionModal(null);
+                  setShowLevelMap(true);
+                }}
+                className="w-full py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-heading font-black text-xs border border-amber-500/50 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span>🗺️</span>
+                <span>Buka Peta Tahap Mario</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1511,7 +1732,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
             <div className="flex items-center justify-center gap-2 mt-3">
               <span className="text-2xl">✨</span>
               <h2 className="text-2xl sm:text-3xl font-heading font-black text-slate-900">
-                Princess Peach Telah Diselamatkan!
+                Puteri Peach Telah Diselamatkan!
               </h2>
               <span className="text-2xl">✨</span>
             </div>
@@ -1519,17 +1740,17 @@ export const MarioGame: React.FC<MarioGameProps> = ({
             {/* Princess Peach Speech Bubble */}
             <div className="my-4 p-4 rounded-2xl bg-pink-100 border-2 border-pink-300 shadow-inner text-center">
               <p className="text-base sm:text-lg font-heading font-bold text-pink-950 italic">
-                “Terima kasih Wira Mario! Berkat pengetahuan tatabahasa ayat perintah kamu, Bos Bowser telah ditewaskan dan saya berjaya dibebaskan!”
+                “Terima kasih Wira Mario! Berkat pengetahuan tatabahasa ayat perintah kamu, Raja Musuh Bowser telah ditewaskan dan beta berjaya dibebaskan!”
               </p>
               <span className="text-xs font-heading font-black text-pink-700 block mt-2">
-                — Princess Peach 💖
+                — Puteri Peach 💖
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-3 my-4">
               <div className="p-3 bg-amber-50 rounded-2xl border-2 border-amber-200">
                 <span className="text-[10px] font-bold text-amber-800 uppercase block">Jumlah Markah</span>
-                <span className="text-2xl font-black text-amber-950">{score} PTS</span>
+                <span className="text-2xl font-black text-amber-950">{score} Mata</span>
               </div>
               <div className="p-3 bg-amber-50 rounded-2xl border-2 border-amber-200">
                 <span className="text-[10px] font-bold text-amber-800 uppercase block">Syiling Emas</span>
@@ -1545,7 +1766,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
               }}
               className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-heading font-black text-base shadow-[0_4px_0_#0f766e] active:translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Selesai & Simpan Pencapaian ke PBS</span>
+              <span>Selesai & Simpan Pencapaian ke Rekod PBD</span>
               <span>🏆</span>
             </button>
           </div>
@@ -1606,7 +1827,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
           {subStage === 'intro' && 'Pengenalan (Wira Mario)'}
           {subStage === 'rules' && 'Cara Bermain'}
           {subStage === 'guide' && 'Panduan Murid'}
-          {subStage === 'playing' && `Level ${currentLevel} (Markah: ${score})`}
+          {subStage === 'playing' && `Tahap ${currentLevel} (Markah: ${score})`}
         </div>
 
         <WoodArrowButton

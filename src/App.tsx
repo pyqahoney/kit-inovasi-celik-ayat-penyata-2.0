@@ -25,13 +25,14 @@ import { MarioGame } from './components/MarioGame';
 import { PacmanGame } from './components/PacmanGame';
 import { LatihDiri } from './components/LatihDiri';
 import { NotaDanVideo } from './components/NotaDanVideo';
+import { LembaranKerja } from './components/LembaranKerja';
 import { ARModule } from './components/ARModule';
 import { PapanPemukaPBS } from './components/PapanPemukaPBS';
 import { DokumentasiPembangun } from './components/DokumentasiPembangun';
 import { KatakLompatLogo, KembaraHartaKarunLogo, WiraMarioLogo, KuasaPacmanLogo } from './components/GameLogoBadges';
 import { INITIAL_STUDENTS, hitungTahapPenguasaan } from './data/learningContent';
 import { StudentPBSRecord } from './types';
-import { sound } from './utils/audio';
+import { sound, CIKGU_FRESHCY_AUDIOS } from './utils/audio';
 import {
   TeacherStandee,
   TeacherTrioShowcase,
@@ -283,7 +284,8 @@ export default function App() {
     coinsToAdd: number,
     completedGameStage?: number,
     quizScorePercent?: number,
-    newBadge?: string
+    newBadge?: string,
+    gameStats?: { game: 'katak' | 'hartaKarun' | 'mario' | 'pacman'; betul: number; salah: number }
   ) => {
     setStudents((prev) =>
       prev.map((s) => {
@@ -301,6 +303,23 @@ export default function App() {
             ? [...s.lencana, newBadge]
             : s.lencana;
 
+        const currentSoalan = s.soalanPermainan || {
+          katak: { betul: 0, salah: 0 },
+          hartaKarun: { betul: 0, salah: 0 },
+          mario: { betul: 0, salah: 0 },
+          pacman: { betul: 0, salah: 0 }
+        };
+
+        const updatedSoalanPermainan = gameStats
+          ? {
+              ...currentSoalan,
+              [gameStats.game]: {
+                betul: Math.max(currentSoalan[gameStats.game]?.betul || 0, gameStats.betul),
+                salah: gameStats.salah
+              }
+            }
+          : currentSoalan;
+
         const newTP = hitungTahapPenguasaan(
           updatedQuizScore,
           updatedGameStage,
@@ -315,6 +334,7 @@ export default function App() {
           skorKuiz: updatedQuizScore,
           lencana: updatedBadges,
           tahapPenguasaan: newTP,
+          soalanPermainan: updatedSoalanPermainan,
           tarikhKemasKini: '2026-10-21'
         };
       })
@@ -557,6 +577,7 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
+                  audioUrl={selectedTeacherId === 'freshcy' ? CIKGU_FRESHCY_AUDIOS.welcome : undefined}
                   bubbleText={`“Hai! Saya ${TEACHER_PROFILES[selectedTeacherId].nama}. Jom belajar ayat perintah bersama cikgu!”`}
                 />
 
@@ -881,6 +902,7 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
+                  audioUrl={selectedTeacherId === 'freshcy' && !encouragementData ? CIKGU_FRESHCY_AUDIOS.emotion : undefined}
                   bubbleText={
                     encouragementData
                       ? encouragementData.type === 'happy'
@@ -1043,6 +1065,7 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
+                  audioUrl={selectedTeacherId === 'freshcy' ? CIKGU_FRESHCY_AUDIOS.symbols : undefined}
                   bubbleText={`“Fahami makna 6 simbol ini agar mudah mengemudi kit inovasi bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`}
                 />
 
@@ -1148,7 +1171,8 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
-                  bubbleText="“Sila tekan butang Pengenalan, Jom Belajar, atau Kuiz untuk memulakan pengembaraan ilmu anda!”"
+                  audioUrl={selectedTeacherId === 'freshcy' ? CIKGU_FRESHCY_AUDIOS.home : undefined}
+                  bubbleText="“Sila tekan butang Pengenalan, Jom Belajar atau Kuiz untuk memulakan pengembaraan ilmu anda!”"
                 />
 
                 {/* Teacher Switcher on Home */}
@@ -1289,6 +1313,13 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
+                  audioUrl={
+                    selectedTeacherId === 'freshcy'
+                      ? introSubPage === 1
+                        ? CIKGU_FRESHCY_AUDIOS.standard
+                        : CIKGU_FRESHCY_AUDIOS.sasaran
+                      : undefined
+                  }
                   bubbleText={
                     introSubPage === 1
                       ? '“Mari kita fahami Standard Kandungan dan Standard Pembelajaran 5.3.2 hari ini!”'
@@ -1422,6 +1453,7 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
+                  audioUrl={selectedTeacherId === 'freshcy' ? CIKGU_FRESHCY_AUDIOS.learnMenu : undefined}
                   bubbleText={`“Sila pilih bahagian yang ingin anda terokai bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`}
                 />
               </div>
@@ -1492,6 +1524,28 @@ export default function App() {
                   </span>
                   <span>➔</span>
                 </button>
+
+                {/* 4. Lembaran Kerja (Cetak PDF) */}
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    setCurrentScreen('worksheets');
+                  }}
+                  className="w-full flex items-center justify-between px-6 py-3.5 rounded-2xl bg-[#ddb892] hover:bg-[#c58f5e] text-[#582f0e] font-heading font-black text-xl border-3 border-[#7f4f24] shadow-[0_5px_0_#7f4f24] active:translate-y-1 transition-all transform hover:scale-102"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center text-sm">
+                      📄
+                    </span>
+                    <span>Lembaran Kerja (Cetak PDF)</span>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full">
+                      4 Lembaran
+                    </span>
+                    <span>➔</span>
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -1539,12 +1593,12 @@ export default function App() {
               soundEnabled={soundEnabled}
               onToggleSound={handleToggleSound}
               onHelp={() => setCurrentScreen('symbols')}
-              title="Pusat Kuiz & Permainan"
+              title="Pilihan Permainan"
             />
 
             <div className="flex-1 flex flex-col items-center justify-center my-4 animate-fade-in z-10">
               <h1 className="text-4xl sm:text-5xl font-black font-heading text-slate-900 mb-3 drop-shadow-sm">
-                Kuiz & Permainan
+                Pilihan Permainan
               </h1>
 
               {/* Selected Teacher Guidance Banner */}
@@ -1564,10 +1618,14 @@ export default function App() {
                   type="button"
                   onClick={() => {
                     sound.playClick();
-                    sound.speakMalay(
-                      `Ayuh murid-murid! Saya ${TEACHER_PROFILES[selectedTeacherId].nama}. Pilih salah satu permainan kegemaran anda dan kumpulkan syiling emas!`,
-                      selectedTeacherId
-                    );
+                    if (selectedTeacherId === 'freshcy') {
+                      sound.playAudioClip(CIKGU_FRESHCY_AUDIOS.quizMenu);
+                    } else {
+                      sound.speakMalay(
+                        `Ayuh murid-murid! Saya ${TEACHER_PROFILES[selectedTeacherId].nama}. Pilih salah satu permainan kegemaran anda dan kumpul sebanyak mungkin syiling emas!`,
+                        selectedTeacherId
+                      );
+                    }
                   }}
                   className="p-2 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 cursor-pointer shadow-xs active:scale-95 transition-all"
                   title={`Dengar nasihat ${TEACHER_PROFILES[selectedTeacherId].nama}`}
@@ -1738,7 +1796,13 @@ export default function App() {
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
             onComplete={(finalScore, coins) => {
-              handleAwardStudent(coins, 1, Math.round((finalScore / 5) * 100), 'Jaguh Katak Lompat');
+              handleAwardStudent(
+                coins,
+                1,
+                Math.round((finalScore / 5) * 100),
+                'Jaguh Katak Lompat',
+                { game: 'katak', betul: finalScore, salah: Math.max(0, 5 - finalScore) }
+              );
             }}
           />
         )}
@@ -1753,7 +1817,13 @@ export default function App() {
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
             onComplete={(finalScore, coins) => {
-              handleAwardStudent(coins, 2, Math.round((finalScore / 7) * 100), 'Kapten Harta Karun');
+              handleAwardStudent(
+                coins,
+                2,
+                Math.round((finalScore / 7) * 100),
+                'Kapten Harta Karun',
+                { game: 'hartaKarun', betul: finalScore, salah: Math.max(0, 7 - finalScore) }
+              );
             }}
           />
         )}
@@ -1768,8 +1838,15 @@ export default function App() {
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
             onComplete={(finalScore, coins) => {
-              handleAwardStudent(coins, 1, Math.round((finalScore / 500) * 100), 'Wira Mario Bahasa');
-              setCurrentScreen('home'); // Go to map after mission completed as requested!
+              const correctCount = Math.min(9, Math.max(2, Math.round(finalScore / 100)));
+              handleAwardStudent(
+                coins,
+                1,
+                Math.round((correctCount / 9) * 100),
+                'Wira Mario Bahasa',
+                { game: 'mario', betul: correctCount, salah: 0 }
+              );
+              setCurrentScreen('home');
             }}
           />
         )}
@@ -1784,7 +1861,14 @@ export default function App() {
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
             onComplete={(finalScore, coins) => {
-              handleAwardStudent(coins, 2, Math.round((finalScore / 600) * 100), 'Jaguh Pac-Man Ayat Perintah');
+              const correctCount = Math.min(4, Math.max(1, Math.round(finalScore / 150)));
+              handleAwardStudent(
+                coins,
+                2,
+                Math.round((correctCount / 4) * 100),
+                'Jaguh Pac-Man Ayat Perintah',
+                { game: 'pacman', betul: correctCount, salah: 0 }
+              );
               setCurrentScreen('home');
             }}
           />
@@ -1823,6 +1907,19 @@ export default function App() {
             onComplete={() => {
               handleAwardStudent(40, undefined, undefined, 'Juara Latih Diri');
             }}
+          />
+        )}
+
+        {/* ========================================================
+            SUBMODULE: LEMBARAN KERJA (CETAK PDF)
+           ======================================================== */}
+        {currentScreen === 'worksheets' && (
+          <LembaranKerja
+            teacherId={selectedTeacherId}
+            onBack={() => setCurrentScreen('learn_menu')}
+            onHome={() => setCurrentScreen('home')}
+            soundEnabled={soundEnabled}
+            onToggleSound={handleToggleSound}
           />
         )}
 
@@ -2006,7 +2103,7 @@ export default function App() {
                 Pengesahan Akses Guru
               </h3>
               <p className="text-xs text-slate-600 mt-1">
-                Bahagian ini dikhaskan untuk Guru Bahasa Melayu bagi menyemak rekod PBS, Tahap Penguasaan TP1–TP6, dan dokumentasi arkitektur.
+                Bahagian ini dikhaskan untuk Guru Bahasa Melayu bagi menyemak rekod PBD, Tahap Penguasaan TP1–TP6 dan dokumentasi arkitektur.
               </p>
             </div>
 

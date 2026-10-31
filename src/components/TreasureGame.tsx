@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { TopNavBar, WoodArrowButton } from './OrganicNav';
 import { TreasureChestVector, BoyVector } from './IllustratedCharacters';
 import { ThreePiratesIllustration } from './StoryGraphics';
-import { Check, X, Compass, Map, ShieldAlert, Award, Sparkles, Navigation, Lock } from 'lucide-react';
+import { Check, X, Compass, Map, ShieldAlert, Award, Sparkles, Navigation, Lock, Mic, MicOff, Volume2, Radio } from 'lucide-react';
 import { sound } from '../utils/audio';
 
 interface TreasureGameProps {
@@ -133,6 +133,30 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
   const [coinAnimating, setCoinAnimating] = useState(false);
   const [scoreEmergeAnim, setScoreEmergeAnim] = useState(true);
 
+  // Oral Mode (Mod Mendengar dan Bertutur) States
+  const [oralMode, setOralMode] = useState<boolean>(false);
+  const [isListening, setIsListening] = useState<boolean>(false);
+  const [speechTranscript, setSpeechTranscript] = useState<string>('');
+  const [oralResult, setOralResult] = useState<'betul' | 'salah' | null>(null);
+  const [oralFeedback, setOralFeedback] = useState<string>('');
+  const [isSpeakingQuestion, setIsSpeakingQuestion] = useState<boolean>(false);
+  const recognitionRef = useRef<any>(null);
+
+  const resetTreasureOralState = () => {
+    setIsListening(false);
+    setSpeechTranscript('');
+    setOralResult(null);
+    setOralFeedback('');
+    setIsSpeakingQuestion(false);
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch {
+        // ignore
+      }
+    }
+  };
+
   // Play Pirate Adventure Module BGM on mount and restore default on unmount
   useEffect(() => {
     sound.playModuleBGM('treasure');
@@ -187,6 +211,7 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
       setTimeout(() => {
         setCoinAnimating(false);
         setSelectedSide(null);
+        resetTreasureOralState();
 
         // Check if all 7 missions are done
         if (newlyCompleted.length >= TREASURE_MISSIONS.length) {
@@ -210,7 +235,7 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
   };
 
   const handleNext = () => {
-    // Return to map as requested: "setiap kali misi selesai, pergi ke peta semula"
+    resetTreasureOralState();
     setSelectedSide(null);
     setCoinAnimating(false);
     if (completedMissions.length >= TREASURE_MISSIONS.length) {
@@ -225,6 +250,7 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
   };
 
   const handleSelectMissionFromMap = (missionIndex: number) => {
+    resetTreasureOralState();
     sound.playClick();
     setCurrentIdx(missionIndex);
     setSelectedSide(null);
@@ -233,12 +259,161 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
   };
 
   const handleReset = () => {
+    resetTreasureOralState();
     setCurrentIdx(0);
     setScore(0);
     setCompletedMissions([]);
     setSelectedSide(null);
     setCoinAnimating(false);
     setStage('intro');
+  };
+
+  // Audio reading of mission question
+  const speakTreasureAudio = () => {
+    sound.playClick();
+    setIsSpeakingQuestion(true);
+    const correctOpt = curMisi.leftOption.isCorrect ? curMisi.leftOption : curMisi.rightOption;
+    const sentenceToRead = curMisi.fullSentence.replace(correctOpt.text, 'tempat kosong');
+    const textPrompt = `${curMisi.misiTajuk}. ${sentenceToRead}. Pilihan syiling emas ialah: Kiri, ${curMisi.leftOption.text}. Kanan, ${curMisi.rightOption.text}. Sila sebutkan pilihan syiling anda!`;
+    sound.speakMalay(textPrompt);
+    setTimeout(() => {
+      setIsSpeakingQuestion(false);
+    }, 7000);
+  };
+
+  // Evaluate student's oral spoken answer for Treasure Game
+  const evaluateTreasureSpokenText = (transcript: string) => {
+    const clean = transcript.toLowerCase().trim().replace(/[.,!?;:"']/g, '');
+    if (!clean) return;
+
+    const leftWord = curMisi.leftOption.text.toLowerCase().trim();
+    const rightWord = curMisi.rightOption.text.toLowerCase().trim();
+
+    // Check if matches left option
+    const matchesLeft =
+      clean.includes(leftWord) ||
+      clean === 'kiri' ||
+      clean === 'syiling kiri' ||
+      clean === 'pilihan kiri';
+
+    // Check if matches right option
+    const matchesRight =
+      clean.includes(rightWord) ||
+      clean === 'kanan' ||
+      clean === 'syiling kanan' ||
+      clean === 'pilihan kanan';
+
+    if (matchesLeft) {
+      setSpeechTranscript(curMisi.leftOption.text);
+      if (curMisi.leftOption.isCorrect) {
+        setOralResult('betul');
+        setOralFeedback(`Tepat sekali! Sebutan "${transcript}" adalah BETUL! Syiling emas dimasukkan ke dalam peti!`);
+        sound.speakMalay(`Tepat sekali! Sebutan ${transcript} adalah betul!`);
+      } else {
+        setOralResult('salah');
+        setOralFeedback(`Sebutan anda "${transcript}" (Syiling Kiri) belum tepat. Sila cuba lagi!`);
+        sound.speakMalay(`Pilihan syiling kiri belum tepat. Sila cuba sebut sekali lagi.`);
+      }
+      handleSelectCoin('left');
+    } else if (matchesRight) {
+      setSpeechTranscript(curMisi.rightOption.text);
+      if (curMisi.rightOption.isCorrect) {
+        setOralResult('betul');
+        setOralFeedback(`Tepat sekali! Sebutan "${transcript}" adalah BETUL! Syiling emas dimasukkan ke dalam peti!`);
+        sound.speakMalay(`Tepat sekali! Sebutan ${transcript} adalah betul!`);
+      } else {
+        setOralResult('salah');
+        setOralFeedback(`Sebutan anda "${transcript}" (Syiling Kanan) belum tepat. Sila cuba lagi!`);
+        sound.speakMalay(`Pilihan syiling kanan belum tepat. Sila cuba sebut sekali lagi.`);
+      }
+      handleSelectCoin('right');
+    } else {
+      setOralResult('salah');
+      setOralFeedback(`Suara dikesan: "${transcript}". Sila sebut kata perintah pada syiling ("${curMisi.leftOption.text}" atau "${curMisi.rightOption.text}")!`);
+      sound.speakMalay(`Jawapan belum dikesan dengan tepat. Sila sebut pilihan syiling sekali lagi.`);
+      sound.playWrong();
+    }
+  };
+
+  const startTreasureOralListening = () => {
+    sound.playClick();
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setOralFeedback(
+        'Pengecaman suara terus tidak disokong pada pelayar ini. Sila sebut jawapan secara lisan dan tekan butang pilihan sebutan di bawah!'
+      );
+      return;
+    }
+
+    try {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'ms-MY';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setSpeechTranscript('');
+        setOralResult(null);
+        setOralFeedback('Sedang mendengar... Sila sebut kata perintah syiling emas sekarang 🎙️');
+      };
+
+      recognition.onresult = (event: any) => {
+        let text = '';
+        for (let i = 0; i < event.results.length; i++) {
+          text += event.results[i][0].transcript;
+        }
+        setSpeechTranscript(text);
+        if (event.results[0].isFinal) {
+          setIsListening(false);
+          evaluateTreasureSpokenText(text);
+        }
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+        setOralFeedback('Suara belum dikesan dengan jelas. Sila tekan butang mikrofon dan sebut semula.');
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      setOralFeedback('Sila benarkan akses mikrofon pelayar untuk menjawab secara lisan.');
+    }
+  };
+
+  const stopTreasureOralListening = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // ignore
+      }
+    }
+    setIsListening(false);
+    if (speechTranscript) {
+      evaluateTreasureSpokenText(speechTranscript);
+    }
+  };
+
+  const handleTreasureOralPracticeChoice = (side: 'left' | 'right') => {
+    sound.playClick();
+    const opt = side === 'left' ? curMisi.leftOption : curMisi.rightOption;
+    setSpeechTranscript(opt.text);
+    sound.speakMalay(`Syiling ${side === 'left' ? 'Kiri' : 'Kanan'}: ${opt.text}`);
+    setTimeout(() => {
+      evaluateTreasureSpokenText(opt.text);
+    }, 400);
   };
 
   return (
@@ -557,6 +732,140 @@ export const TreasureGame: React.FC<TreasureGameProps> = ({
               <span>Peta Misi 🗺️</span>
             </button>
           </div>
+
+          {/* Mode Switcher Bar (Sentuh Syiling vs Mendengar & Bertutur) */}
+          <div className="flex flex-wrap items-center justify-between gap-2 max-w-xl mx-auto w-full mb-2">
+            <span className="text-[11px] font-bold text-amber-950 flex items-center gap-1">
+              <Sparkles size={13} className="text-amber-600" /> Mod Permainan:
+            </span>
+            <div className="flex items-center gap-1 bg-amber-200/80 p-1 rounded-2xl shadow-inner">
+              <button
+                type="button"
+                onClick={() => {
+                  setOralMode(false);
+                  sound.playClick();
+                }}
+                className={`px-3 py-1 rounded-xl text-xs font-heading font-bold transition-all cursor-pointer ${
+                  !oralMode
+                    ? 'bg-amber-600 text-white shadow-sm'
+                    : 'text-amber-900 hover:bg-amber-300'
+                }`}
+              >
+                🪙 Sentuh Syiling
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOralMode(true);
+                  sound.playClick();
+                }}
+                className={`flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-heading font-bold transition-all cursor-pointer ${
+                  oralMode
+                    ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-sm'
+                    : 'text-teal-900 hover:bg-teal-200'
+                }`}
+              >
+                <Mic size={14} />
+                <span>🎙️ Mendengar & Bertutur</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Oral Listening & Speaking Panel */}
+          {oralMode && (
+            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-400 p-3 sm:p-4 rounded-2xl shadow-md max-w-xl mx-auto w-full mb-2 animate-fade-in">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pb-2 border-b border-teal-200">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm shadow">
+                    🎙️
+                  </span>
+                  <div>
+                    <span className="text-xs font-heading font-black text-teal-950 block">
+                      Mod Mendengar & Bertutur Lanun
+                    </span>
+                    <span className="text-[10px] text-teal-700 font-bold block">
+                      Dengar soalan misi, sebut jawapan syiling, dan syiling akan melayang masuk ke peti!
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={speakTreasureAudio}
+                  className={`px-3 py-1 rounded-xl text-xs font-heading font-bold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer ${
+                    isSpeakingQuestion
+                      ? 'bg-amber-400 text-amber-950 animate-pulse ring-2 ring-amber-300'
+                      : 'bg-teal-600 hover:bg-teal-700 text-white'
+                  }`}
+                >
+                  <Volume2 size={13} />
+                  <span>{isSpeakingQuestion ? 'Sedang Membaca...' : 'Dengar Misi 🔊'}</span>
+                </button>
+              </div>
+
+              {/* Big Microphone button & Speech detection */}
+              <div className="flex flex-col items-center justify-center my-2.5">
+                <button
+                  onClick={isListening ? stopTreasureOralListening : startTreasureOralListening}
+                  disabled={selectedSide !== null || coinAnimating}
+                  className={`px-5 py-2.5 rounded-full font-heading font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all shadow-md active:scale-95 cursor-pointer ${
+                    isListening
+                      ? 'bg-rose-500 hover:bg-rose-600 text-white ring-4 ring-rose-300 animate-pulse'
+                      : selectedSide !== null
+                      ? 'bg-emerald-600 text-white cursor-default'
+                      : 'bg-gradient-to-r from-teal-600 to-sky-600 hover:from-teal-700 hover:to-sky-700 text-white hover:scale-103'
+                  }`}
+                >
+                  <span className="text-xl">{isListening ? '🔴' : '🎙️'}</span>
+                  <span>
+                    {isListening
+                      ? 'Sedang Mendengar... Sila Sebut Jawapan Syiling!'
+                      : selectedSide !== null
+                      ? 'Syiling Berjaya Dipilih! ✓'
+                      : 'Tekan Mikrofon & Sebut Syiling (Kiri / Kanan)'}
+                  </span>
+                </button>
+
+                {speechTranscript && (
+                  <div className="mt-2 px-3 py-1 bg-white border border-teal-300 rounded-xl text-xs font-mono font-bold text-slate-900 shadow-2xs">
+                    Suara dikesan: “{speechTranscript}”
+                  </div>
+                )}
+
+                {oralFeedback && (
+                  <div
+                    className={`mt-1.5 px-3 py-1 rounded-xl text-[11px] font-heading font-bold border ${
+                      oralResult === 'betul'
+                        ? 'bg-emerald-100 text-emerald-950 border-emerald-400 animate-bounce'
+                        : 'bg-rose-100 text-rose-950 border-rose-300'
+                    }`}
+                  >
+                    {oralFeedback}
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Pronunciation Buttons */}
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-2 border-t border-teal-200/80">
+                <span className="text-[10px] text-teal-800 font-bold">Uji sebutan syiling:</span>
+                <button
+                  onClick={() => handleTreasureOralPracticeChoice('left')}
+                  disabled={selectedSide !== null || coinAnimating}
+                  className="px-2.5 py-1 rounded-xl bg-white hover:bg-teal-100 border border-teal-300 text-teal-950 text-xs font-heading font-bold flex items-center gap-1 active:scale-95 shadow-2xs transition-all cursor-pointer"
+                >
+                  <span>🗣️</span>
+                  <span>Sebut: <strong>"{curMisi.leftOption.text}"</strong> (Kiri)</span>
+                </button>
+                <button
+                  onClick={() => handleTreasureOralPracticeChoice('right')}
+                  disabled={selectedSide !== null || coinAnimating}
+                  className="px-2.5 py-1 rounded-xl bg-white hover:bg-teal-100 border border-teal-300 text-teal-950 text-xs font-heading font-bold flex items-center gap-1 active:scale-95 shadow-2xs transition-all cursor-pointer"
+                >
+                  <span>🗣️</span>
+                  <span>Sebut: <strong>"{curMisi.rightOption.text}"</strong> (Kanan)</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Question Text Box matching Storyboard Page 38-44 */}
           <div className="bg-white/95 p-4 rounded-3xl border-3 border-amber-400 shadow-md max-w-xl mx-auto w-full text-center">

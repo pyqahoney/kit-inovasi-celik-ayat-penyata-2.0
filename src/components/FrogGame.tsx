@@ -3,7 +3,7 @@ import confetti from 'canvas-confetti';
 import { TopNavBar, WoodArrowButton } from './OrganicNav';
 import { FrogVector } from './IllustratedCharacters';
 import { BlueBirdVector, CuteSunVector, FoliageForeground, ButterflyVector } from './StoryGraphics';
-import { Camera, CameraOff, Sparkles, RefreshCw, FlipHorizontal, Eye, Maximize2 } from 'lucide-react';
+import { Camera, CameraOff, Sparkles, RefreshCw, FlipHorizontal, Eye, Maximize2, Mic, MicOff, Volume2, Radio, Hand } from 'lucide-react';
 import { sound } from '../utils/audio';
 
 interface FrogGameProps {
@@ -122,11 +122,20 @@ export const FrogGame: React.FC<FrogGameProps> = ({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Real-world hand detection states
+  // Real-world hand detection states (TIDAK Sensitif Warna Kulit - Detect Tangan Sahaja)
   const [detectedHandZone, setDetectedHandZone] = useState<'A' | 'B' | 'C' | null>(null);
   const [handDwellProgress, setHandDwellProgress] = useState<number>(0);
   const analyzerCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const prevFrameDataRef = useRef<Uint8ClampedArray | null>(null);
+
+  // Oral Mode (Mod Mendengar dan Bertutur) States
+  const [oralMode, setOralMode] = useState<boolean>(false);
+  const [isListening, setIsListening] = useState<boolean>(false);
+  const [speechTranscript, setSpeechTranscript] = useState<string>('');
+  const [oralResult, setOralResult] = useState<'betul' | 'salah' | null>(null);
+  const [oralFeedback, setOralFeedback] = useState<string>('');
+  const [isSpeakingQuestion, setIsSpeakingQuestion] = useState<boolean>(false);
+  const recognitionRef = useRef<any>(null);
 
   // Bind stream to video element whenever cameraActive or arMode changes
   useEffect(() => {
@@ -239,7 +248,23 @@ export const FrogGame: React.FC<FrogGameProps> = ({
     }
   };
 
+  const resetFrogOralState = () => {
+    setIsListening(false);
+    setSpeechTranscript('');
+    setOralResult(null);
+    setOralFeedback('');
+    setIsSpeakingQuestion(false);
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch {
+        // ignore
+      }
+    }
+  };
+
   const handleNextQuestion = () => {
+    resetFrogOralState();
     if (currentIdx < FROG_QUESTIONS.length - 1) {
       setCurrentIdx((prev) => prev + 1);
       setSelectedLeaf(null);
@@ -265,12 +290,14 @@ export const FrogGame: React.FC<FrogGameProps> = ({
   };
 
   const handleRetryQuestion = () => {
+    resetFrogOralState();
     setSelectedLeaf(null);
     setFrogPosition('bank');
     setAnswerState('idle');
   };
 
   const handleRestart = () => {
+    resetFrogOralState();
     setCurrentIdx(0);
     setScore(0);
     setSelectedLeaf(null);
@@ -279,7 +306,148 @@ export const FrogGame: React.FC<FrogGameProps> = ({
     setSubStage('intro');
   };
 
-  // Real-Time Optical Hand Tracking in Real World (Pengesan Tangan Alam Nyata - Kurang Sensitif Warna)
+  // Audio reading for oral listening mode
+  const speakQuestionAudio = () => {
+    sound.playClick();
+    setIsSpeakingQuestion(true);
+    const correctOpt = curQ.options.find((o) => o.isCorrect);
+    const sentenceToRead = curQ.fullSentence.replace(correctOpt?.text || '', 'tempat kosong');
+    const optionsPrompt = curQ.options.map((o) => `Daun ${o.key}, ${o.text}`).join('; ');
+    const textPrompt = `Soalan ${currentIdx + 1}. ${sentenceToRead}. Pilihan daun teratai ialah: ${optionsPrompt}. Sila sebutkan jawapan daun anda secara lisan!`;
+    sound.speakMalay(textPrompt);
+    setTimeout(() => {
+      setIsSpeakingQuestion(false);
+    }, 7000);
+  };
+
+  // Evaluate student's oral spoken answer for Frog Game
+  const evaluateFrogSpokenText = (transcript: string) => {
+    const clean = transcript.toLowerCase().trim().replace(/[.,!?;:"']/g, '');
+    if (!clean) return;
+
+    const correctOpt = curQ.options.find((o) => o.isCorrect);
+    if (!correctOpt) return;
+
+    const correctWord = correctOpt.text.toLowerCase().trim();
+    const correctKey = correctOpt.key.toLowerCase();
+
+    // Check if user says the correct option word or letter
+    const isCorrect =
+      clean.includes(correctWord) ||
+      clean === correctKey ||
+      clean === `daun ${correctKey}` ||
+      clean === `pilihan ${correctKey}` ||
+      clean.includes(`daun ${correctWord}`);
+
+    if (isCorrect) {
+      setOralResult('betul');
+      setOralFeedback(`Tepat sekali! Sebutan "${transcript}" adalah BETUL! Katak melompat ke Daun ${correctOpt.key}!`);
+      sound.speakMalay(`Tepat sekali! Sebutan ${transcript} adalah betul!`);
+      handleSelectLeaf(correctOpt.key);
+    } else {
+      // Check if user spoke one of the other options
+      const wrongOpt = curQ.options.find((o) => {
+        const wWord = o.text.toLowerCase().trim();
+        const wKey = o.key.toLowerCase();
+        return clean.includes(wWord) || clean === wKey || clean === `daun ${wKey}`;
+      });
+
+      setOralResult('salah');
+      if (wrongOpt) {
+        setOralFeedback(`Sebutan anda "${transcript}" (Daun ${wrongOpt.key}) belum tepat. Sila cuba lagi!`);
+        sound.speakMalay(`Sebutan Daun ${wrongOpt.key} belum tepat. Sila cuba sebut sekali lagi.`);
+        handleSelectLeaf(wrongOpt.key);
+      } else {
+        setOralFeedback(`Suara dikesan: "${transcript}". Jawapan belum tepat. Sila sebut perkataan pada daun yang betul!`);
+        sound.speakMalay(`Jawapan belum tepat. Sila cuba sebut perkataan daun teratai sekali lagi.`);
+        sound.playWrong();
+      }
+    }
+  };
+
+  // Start Speech Recognition
+  const startFrogOralListening = () => {
+    sound.playClick();
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setOralFeedback(
+        'Pengecaman suara terus tidak disokong pada pelayar ini. Sila sebut jawapan secara lisan dan tekan butang pilihan sebutan di bawah!'
+      );
+      return;
+    }
+
+    try {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'ms-MY';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setSpeechTranscript('');
+        setOralResult(null);
+        setOralFeedback('Sedang mendengar... Sila sebut perkataan jawapan daun anda sekarang 🎙️');
+      };
+
+      recognition.onresult = (event: any) => {
+        let text = '';
+        for (let i = 0; i < event.results.length; i++) {
+          text += event.results[i][0].transcript;
+        }
+        setSpeechTranscript(text);
+        if (event.results[0].isFinal) {
+          setIsListening(false);
+          evaluateFrogSpokenText(text);
+        }
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+        setOralFeedback('Suara belum dikesan dengan jelas. Sila tekan butang mikrofon dan sebut semula.');
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      setOralFeedback('Sila benarkan akses mikrofon pelayar untuk menjawab secara lisan.');
+    }
+  };
+
+  const stopFrogOralListening = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // ignore
+      }
+    }
+    setIsListening(false);
+    if (speechTranscript) {
+      evaluateFrogSpokenText(speechTranscript);
+    }
+  };
+
+  // Practice oral pronunciation directly
+  const handleFrogOralPracticeChoice = (opt: { key: string; text: string }) => {
+    sound.playClick();
+    setSpeechTranscript(opt.text);
+    sound.speakMalay(`Daun ${opt.key}: ${opt.text}`);
+    setTimeout(() => {
+      evaluateFrogSpokenText(opt.text);
+    }, 400);
+  };
+
+  // Real-Time Optical Hand Tracking in Real World (TIDAK Sensitif Warna Kulit - Detect Tangan Sahaja)
   useEffect(() => {
     if (!arMode || !cameraActive || answerState !== 'idle' || subStage !== 'playing') {
       setDetectedHandZone(null);
@@ -312,20 +480,20 @@ export const FrogGame: React.FC<FrogGameProps> = ({
         for (let y = 15; y < 110; y += 4) {
           for (let x = 15; x < 145; x += 4) {
             const idx = (y * 160 + x) * 4;
-            const rDiff = Math.abs(data[idx] - prevData[idx]);
-            const gDiff = Math.abs(data[idx + 1] - prevData[idx + 1]);
-            const bDiff = Math.abs(data[idx + 2] - prevData[idx + 2]);
-            const totalDiff = rDiff + gDiff + bDiff;
+            // Gunakan perbezaan luminans (pantulan cahaya tangan) - tidak bergantung pada warna kulit
+            const curLum = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+            const prevLum = 0.299 * prevData[idx] + 0.587 * prevData[idx + 1] + 0.114 * prevData[idx + 2];
+            const diff = Math.abs(curLum - prevLum);
 
-            // Kurangkan sensitiviti terhadap warna: fokus pada pergerakan tangan fizikal yang jelas
-            const weight = totalDiff > 50 ? 2 : (totalDiff > 32 ? 1 : 0);
+            // Fokus pada pergerakan fizikal tangan yang jelas di zon daun (Bukan warna kulit)
+            const weight = diff > 20 ? 2 : (diff > 12 ? 1 : 0);
 
             if (weight > 0) {
-              if (x >= 15 && x <= 55 && y >= 50) {
+              if (x >= 15 && x <= 55 && y >= 45) {
                 scoreA += weight;
-              } else if (x >= 55 && x <= 105 && y <= 55) {
+              } else if (x >= 55 && x <= 105 && y <= 60) {
                 scoreB += weight;
-              } else if (x >= 105 && x <= 150 && y >= 50) {
+              } else if (x >= 105 && x <= 150 && y >= 45) {
                 scoreC += weight;
               }
             }
@@ -335,7 +503,7 @@ export const FrogGame: React.FC<FrogGameProps> = ({
 
       prevFrameDataRef.current = new Uint8ClampedArray(data);
 
-      const threshold = 28;
+      const threshold = 12;
       let foundZone: 'A' | 'B' | 'C' | null = null;
       let maxScore = threshold;
 
@@ -582,49 +750,155 @@ export const FrogGame: React.FC<FrogGameProps> = ({
             )}
           </div>
 
-          {/* Dual Mode Switcher Bar */}
-          <div className="flex items-center justify-between gap-2 max-w-2xl mx-auto w-full my-1">
+          {/* Mode Switcher Bar (Sungai, AR, Lisan) */}
+          <div className="flex flex-wrap items-center justify-between gap-2 max-w-2xl mx-auto w-full my-1">
             <span className="text-[11px] font-bold text-amber-950 flex items-center gap-1">
-              <Sparkles size={13} className="text-amber-600" /> Mod Pengalaman:
+              <Sparkles size={13} className="text-amber-600" /> Mod Permainan:
             </span>
             <div className="flex items-center gap-1 bg-amber-200/80 p-1 rounded-2xl shadow-inner">
               <button
                 type="button"
                 onClick={() => {
                   stopARCamera();
+                  setOralMode(false);
                   sound.playClick();
                 }}
-                className={`px-3 py-1 rounded-xl text-xs font-heading font-bold transition-all ${
-                  !arMode
+                className={`px-2.5 sm:px-3 py-1 rounded-xl text-xs font-heading font-bold transition-all cursor-pointer ${
+                  !arMode && !oralMode
                     ? 'bg-emerald-600 text-white shadow-sm'
                     : 'text-amber-900 hover:bg-amber-300'
                 }`}
               >
-                🌿 Mod Sungai
+                🌿 Sungai
               </button>
               <button
                 type="button"
                 onClick={() => {
+                  setOralMode(false);
                   if (!arMode) {
                     startARCamera();
                   } else {
                     stopARCamera();
                   }
                 }}
-                className={`flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-heading font-bold transition-all ${
+                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-xl text-xs font-heading font-bold transition-all cursor-pointer ${
                   arMode
                     ? 'bg-amber-500 text-slate-950 shadow-sm'
                     : 'text-amber-900 hover:bg-amber-300'
                 }`}
               >
                 <Camera size={14} />
-                <span>📷 Mod Kamera AR</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-red-600 text-white font-black animate-pulse">
-                  AKTIF
-                </span>
+                <span>📷 Kamera AR</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  stopARCamera();
+                  setOralMode(true);
+                  sound.playClick();
+                }}
+                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-xl text-xs font-heading font-bold transition-all cursor-pointer ${
+                  oralMode
+                    ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-sm'
+                    : 'text-teal-900 hover:bg-teal-200'
+                }`}
+              >
+                <Mic size={14} />
+                <span>🎙️ Mendengar & Bertutur</span>
               </button>
             </div>
           </div>
+
+          {/* Oral Mode Interaction Panel */}
+          {oralMode && (
+            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-400 p-3 sm:p-4 rounded-2xl shadow-md max-w-2xl mx-auto w-full my-1 animate-fade-in">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pb-2 border-b border-teal-200">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-full bg-teal-600 text-white flex items-center justify-center text-sm shadow">
+                    🎙️
+                  </span>
+                  <div>
+                    <span className="text-xs font-heading font-black text-teal-950 block">
+                      Mod Mendengar & Bertutur Si Katak
+                    </span>
+                    <span className="text-[10px] text-teal-700 font-bold block">
+                      Dengar audio soalan, sebut pilihan daun, dan katak akan melompat secara automatik!
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={speakQuestionAudio}
+                  className={`px-3 py-1 rounded-xl text-xs font-heading font-bold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer ${
+                    isSpeakingQuestion
+                      ? 'bg-amber-400 text-amber-950 animate-pulse ring-2 ring-amber-300'
+                      : 'bg-teal-600 hover:bg-teal-700 text-white'
+                  }`}
+                >
+                  <Volume2 size={13} />
+                  <span>{isSpeakingQuestion ? 'Sedang Membaca...' : 'Dengar Soalan 🔊'}</span>
+                </button>
+              </div>
+
+              {/* Big Microphone button & Speech detection */}
+              <div className="flex flex-col items-center justify-center my-2.5">
+                <button
+                  onClick={isListening ? stopFrogOralListening : startFrogOralListening}
+                  disabled={answerState === 'correct'}
+                  className={`px-5 py-2.5 rounded-full font-heading font-black text-xs sm:text-sm flex items-center gap-2.5 transition-all shadow-md active:scale-95 cursor-pointer ${
+                    isListening
+                      ? 'bg-rose-500 hover:bg-rose-600 text-white ring-4 ring-rose-300 animate-pulse'
+                      : answerState === 'correct'
+                      ? 'bg-emerald-600 text-white cursor-default'
+                      : 'bg-gradient-to-r from-teal-600 to-sky-600 hover:from-teal-700 hover:to-sky-700 text-white hover:scale-103'
+                  }`}
+                >
+                  <span className="text-xl">{isListening ? '🔴' : '🎙️'}</span>
+                  <span>
+                    {isListening
+                      ? 'Sedang Mendengar... Sila Sebut Pilihan Daun!'
+                      : answerState === 'correct'
+                      ? 'Katak Berjaya Melompat ke Daun! ✓'
+                      : 'Tekan Mikrofon & Sebut Pilihan Daun (A / B / C)'}
+                  </span>
+                </button>
+
+                {speechTranscript && (
+                  <div className="mt-2 px-3 py-1 bg-white border border-teal-300 rounded-xl text-xs font-mono font-bold text-slate-900 shadow-2xs">
+                    Suara dikesan: “{speechTranscript}”
+                  </div>
+                )}
+
+                {oralFeedback && (
+                  <div
+                    className={`mt-1.5 px-3 py-1 rounded-xl text-[11px] font-heading font-bold border ${
+                      oralResult === 'betul'
+                        ? 'bg-emerald-100 text-emerald-950 border-emerald-400 animate-bounce'
+                        : 'bg-rose-100 text-rose-950 border-rose-300'
+                    }`}
+                  >
+                    {oralFeedback}
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Pronunciation Buttons */}
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-2 border-t border-teal-200/80">
+                <span className="text-[10px] text-teal-800 font-bold">Uji sebutan daun:</span>
+                {curQ.options.map((opt) => (
+                  <button
+                    key={opt.key}
+                    onClick={() => handleFrogOralPracticeChoice(opt)}
+                    disabled={answerState === 'correct'}
+                    className="px-2.5 py-1 rounded-xl bg-white hover:bg-teal-100 border border-teal-300 text-teal-950 text-xs font-heading font-bold flex items-center gap-1 active:scale-95 shadow-2xs transition-all cursor-pointer"
+                  >
+                    <span>🗣️</span>
+                    <span>Sebut: <strong>"{opt.text}"</strong> (Daun {opt.key})</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Interactive Arena (Functional AR Camera Viewport OR 2D Cartoon River Stream - Expansive Landscape on Desktop) */}
           <div className={`relative my-1 h-72 sm:h-80 md:h-[420px] lg:h-[480px] xl:h-[520px] w-full max-w-5xl mx-auto rounded-3xl overflow-hidden border-4 shadow-2xl transition-all ${
@@ -670,10 +944,10 @@ export const FrogGame: React.FC<FrogGameProps> = ({
                       <span className="text-[10px] sm:text-xs font-heading font-black block">
                         {detectedHandZone
                           ? `Tangan dikesan pada Teratai ${detectedHandZone}! (${handDwellProgress}%)`
-                          : 'Tunjukkan tangan di hadapan kamera pada daun teratai di alam nyata!'}
+                          : 'Tunjukkan tangan di hadapan kamera pada daun teratai!'}
                       </span>
-                      <span className="text-[8px] sm:text-[9px] text-cyan-300 font-mono block">
-                        Halakan jari/tangan anda ke daun teratai (A, B atau C) untuk memilih
+                      <span className="text-[8px] sm:text-[9px] text-emerald-300 font-mono block">
+                        Pengesan tangan optikal (bukan warna kulit) · Halakan tangan ke Daun A, B atau C
                       </span>
                     </div>
                   </div>

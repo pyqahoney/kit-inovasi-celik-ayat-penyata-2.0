@@ -21,7 +21,9 @@ export const TopNavBar: React.FC<{
       setBgmOn(st.bgmEnabled);
       setSfxOn(st.sfxEnabled);
     });
-    return () => unsub();
+    return () => {
+      unsub();
+    };
   }, []);
 
   const handleToggleBgm = (e: React.MouseEvent) => {

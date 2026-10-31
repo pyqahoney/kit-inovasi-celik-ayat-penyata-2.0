@@ -104,6 +104,7 @@ interface TeacherStandeeProps {
   size?: 'sm' | 'md' | 'lg';
   showBubble?: boolean;
   bubbleText?: string;
+  audioUrl?: string;
   onClick?: () => void;
   interactive?: boolean;
   className?: string;
@@ -114,6 +115,7 @@ export const TeacherStandee: React.FC<TeacherStandeeProps> = ({
   size = 'md',
   showBubble = true,
   bubbleText,
+  audioUrl,
   onClick,
   interactive = true,
   className = ''
@@ -175,8 +177,12 @@ export const TeacherStandee: React.FC<TeacherStandeeProps> = ({
               onClick={(e) => {
                 e.stopPropagation();
                 sound.playClick();
-                const speechText = bubbleText || profile.ucapanMesra;
-                sound.speakMalay(speechText, profile.id);
+                if (audioUrl) {
+                  sound.playAudioClip(audioUrl);
+                } else {
+                  const speechText = bubbleText || profile.ucapanMesra;
+                  sound.speakMalay(speechText, profile.id);
+                }
               }}
               aria-label={`Dengar suara ${profile.nama}`}
               title="Tekan untuk dengar audio sebutan cikgu"
