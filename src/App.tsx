@@ -32,7 +32,7 @@ import { DokumentasiPembangun } from './components/DokumentasiPembangun';
 import { KatakLompatLogo, KembaraHartaKarunLogo, WiraMarioLogo, KuasaPacmanLogo } from './components/GameLogoBadges';
 import { INITIAL_STUDENTS, hitungTahapPenguasaan } from './data/learningContent';
 import { StudentPBSRecord } from './types';
-import { sound, CIKGU_FRESHCY_AUDIOS } from './utils/audio';
+import { sound, CIKGU_FRESHCY_AUDIOS, CIKGU_SYAFIQAH_AUDIOS } from './utils/audio';
 import {
   TeacherStandee,
   TeacherTrioShowcase,
@@ -577,7 +577,13 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
-                  audioUrl={selectedTeacherId === 'freshcy' ? CIKGU_FRESHCY_AUDIOS.welcome : undefined}
+                  audioUrl={
+                    selectedTeacherId === 'freshcy'
+                      ? CIKGU_FRESHCY_AUDIOS.welcome
+                      : selectedTeacherId === 'syafiqah'
+                      ? CIKGU_SYAFIQAH_AUDIOS.welcome
+                      : undefined
+                  }
                   bubbleText={`“Hai! Saya ${TEACHER_PROFILES[selectedTeacherId].nama}. Jom belajar ayat perintah bersama cikgu!”`}
                 />
 
@@ -902,7 +908,15 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
-                  audioUrl={selectedTeacherId === 'freshcy' && !encouragementData ? CIKGU_FRESHCY_AUDIOS.emotion : undefined}
+                  audioUrl={
+                    !encouragementData
+                      ? selectedTeacherId === 'freshcy'
+                        ? CIKGU_FRESHCY_AUDIOS.emotion
+                        : selectedTeacherId === 'syafiqah'
+                        ? CIKGU_SYAFIQAH_AUDIOS.emotion
+                        : undefined
+                      : undefined
+                  }
                   bubbleText={
                     encouragementData
                       ? encouragementData.type === 'happy'
@@ -1065,7 +1079,13 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
-                  audioUrl={selectedTeacherId === 'freshcy' ? CIKGU_FRESHCY_AUDIOS.symbols : undefined}
+                  audioUrl={
+                    selectedTeacherId === 'freshcy'
+                      ? CIKGU_FRESHCY_AUDIOS.symbols
+                      : selectedTeacherId === 'syafiqah'
+                      ? CIKGU_SYAFIQAH_AUDIOS.panduanNavigasi
+                      : undefined
+                  }
                   bubbleText={`“Fahami makna 6 simbol ini agar mudah mengemudi kit inovasi bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`}
                 />
 
@@ -1170,7 +1190,13 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
-                  audioUrl={selectedTeacherId === 'freshcy' ? CIKGU_FRESHCY_AUDIOS.home : undefined}
+                  audioUrl={
+                    selectedTeacherId === 'freshcy'
+                      ? CIKGU_FRESHCY_AUDIOS.home
+                      : selectedTeacherId === 'syafiqah'
+                      ? CIKGU_SYAFIQAH_AUDIOS.halamanUtama
+                      : undefined
+                  }
                   bubbleText="“Sila tekan butang Pengenalan, Jom Belajar atau Kuiz untuk memulakan pengembaraan ilmu anda!”"
                 />
 
@@ -1317,6 +1343,8 @@ export default function App() {
                       ? introSubPage === 1
                         ? CIKGU_FRESHCY_AUDIOS.standard
                         : CIKGU_FRESHCY_AUDIOS.sasaran
+                      : selectedTeacherId === 'syafiqah'
+                      ? CIKGU_SYAFIQAH_AUDIOS.sasaran
                       : undefined
                   }
                   bubbleText={
@@ -1452,7 +1480,13 @@ export default function App() {
                   teacherId={selectedTeacherId}
                   size="md"
                   showBubble={true}
-                  audioUrl={selectedTeacherId === 'freshcy' ? CIKGU_FRESHCY_AUDIOS.learnMenu : undefined}
+                  audioUrl={
+                    selectedTeacherId === 'freshcy'
+                      ? CIKGU_FRESHCY_AUDIOS.learnMenu
+                      : selectedTeacherId === 'syafiqah'
+                      ? CIKGU_SYAFIQAH_AUDIOS.terokai
+                      : undefined
+                  }
                   bubbleText={`“Sila pilih bahagian yang ingin anda terokai bersama ${TEACHER_PROFILES[selectedTeacherId].nama}!”`}
                 />
               </div>
@@ -1619,6 +1653,8 @@ export default function App() {
                     sound.playClick();
                     if (selectedTeacherId === 'freshcy') {
                       sound.playAudioClip(CIKGU_FRESHCY_AUDIOS.quizMenu);
+                    } else if (selectedTeacherId === 'syafiqah') {
+                      sound.playAudioClip(CIKGU_SYAFIQAH_AUDIOS.pilihanPermainan);
                     } else {
                       sound.speakMalay(
                         `Ayuh murid-murid! Saya ${TEACHER_PROFILES[selectedTeacherId].nama}. Pilih salah satu permainan kegemaran anda dan kumpul sebanyak mungkin syiling emas!`,
@@ -1879,7 +1915,9 @@ export default function App() {
         {currentScreen === 'notes' && (
           <NotaDanVideo
             initialSubTab="nota"
+            teacherId={selectedTeacherId}
             onBack={() => setCurrentScreen('learn_menu')}
+            onHome={() => setCurrentScreen('home')}
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
           />
@@ -1888,7 +1926,9 @@ export default function App() {
         {currentScreen === 'video' && (
           <NotaDanVideo
             initialSubTab="video"
+            teacherId={selectedTeacherId}
             onBack={() => setCurrentScreen('learn_menu')}
+            onHome={() => setCurrentScreen('home')}
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
           />

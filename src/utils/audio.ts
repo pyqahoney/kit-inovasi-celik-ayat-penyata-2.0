@@ -35,30 +35,30 @@ export const CIKGU_FRESHCY_AUDIOS = {
 };
 
 /**
- * Audio Rakaman Suara Cikgu Syafiqah
+ * Audio Rakaman Suara Cikgu Syafiqah yang Sebenar
  */
 export const CIKGU_SYAFIQAH_AUDIOS = {
-  welcome: '/assets/aistudio/hai! saya cikgu Syafiqah. jom belajar ayat perintah bersama cikgu.m4a',
-  emotion: '/assets/aistudio/hai! cikgu nak tanya, bagaimana perasaan kamu hari ini pilih muka gembira atau perlukan semangat di sebalah ya.m4a',
-  halamanUtama: '/assets/aistudio/halaman utama cikgu Syafiqah .m4a',
-  pilihanPermainan: '/assets/aistudio/halaman pilihan permainan cikgu Syafiqah .m4a',
-  videoPembelajaran: '/assets/aistudio/halaman video pembelajaran cikgu Syafiqah .m4a',
-  latihDiri: '/assets/aistudio/latih diri cikgu Syafiqah .m4a',
-  panduanNavigasi: '/assets/aistudio/panduan navigasi cikgu syafiqah.m4a',
-  sasaran: '/assets/aistudio/sasaran kita kuasai 4 jenis ayat perintah dengan tepat.m4a',
-  terokai: '/assets/aistudio/Sila pilih bahagian yang ingin anda terokai bersama cikgu Syafiqah .m4a',
-  definisiTindakan: '/assets/aistudio/ayat yang digunakan untuk menimbulkan sesuatu tindakan.m4a',
-  orangKedua: '/assets/aistudio/perintah ditujukan kepada orang kedua menggunakan kata ganti nama orang kedua.m4a',
+  welcome: '/assets/aistudio/hai__saya_cikgu_Syafiqah._jom_belajar_ayat_perintah_bersama_cikgu_4d30c7a1.m4a',
+  emotion: '/assets/aistudio/hai__cikgu_nak_tanya__bagaimana_perasaan_kamu_hari_ini_pilih_muka_gembira_atau_perlukan_semangat_di_sebalah_ya_c25966da.m4a',
+  halamanUtama: '/assets/aistudio/halaman_utama_cikgu_Syafiqah__64a99f82.m4a',
+  pilihanPermainan: '/assets/aistudio/halaman_pilihan_permainan_cikgu_Syafiqah__00503dad.m4a',
+  videoPembelajaran: '/assets/aistudio/halaman_video_pembelajaran_cikgu_Syafiqah__a235cfd7.m4a',
+  latihDiri: '/assets/aistudio/latih_diri_cikgu_Syafiqah__a7098f19.m4a',
+  panduanNavigasi: '/assets/aistudio/panduan_navigasi_cikgu_syafiqah_7bc869df.m4a',
+  sasaran: '/assets/aistudio/sasaran_kita_kuasai_4_jenis_ayat_perintah_dengan_tepat_07125098.m4a',
+  terokai: '/assets/aistudio/Sila_pilih_bahagian_yang_ingin_anda_terokai_bersama_cikgu_Syafiqah__13b2a48e.m4a',
+  definisiTindakan: '/assets/aistudio/ayat_yang_digunakan_untuk_menimbulkan_sesuatu_tindakan_dcb8a3a0.m4a',
+  orangKedua: '/assets/aistudio/perintah_ditujukan_kepada_orang_kedua_menggunakan_kata_ganti_nama_orang_kedua_678c0dcf.m4a',
   // Nota interaktif ms 3
-  nota3Larangan: '/assets/aistudio/nota interaktif halaman 3 jenis ayat larangan .m4a',
-  nota3Permintaan: '/assets/aistudio/nota interaktif halaman 3 jenis ayat permintaan .m4a',
-  nota3Silaan: '/assets/aistudio/nota interaktif halaman 3 jenis ayat silaan.m4a',
-  nota3Suruhan: '/assets/aistudio/nota interaktif halaman 3 jenis ayat suruhan.m4a',
+  nota3Larangan: '/assets/aistudio/nota_interaktif_halaman_3_jenis_ayat_larangan__35a8f9ae.m4a',
+  nota3Permintaan: '/assets/aistudio/nota_interaktif_halaman_3_jenis_ayat_permintaan__5ea71fef.m4a',
+  nota3Silaan: '/assets/aistudio/nota_interaktif_halaman_3_jenis_ayat_silaan_49bfbfa4.m4a',
+  nota3Suruhan: '/assets/aistudio/nota_interaktif_halaman_3_jenis_ayat_suruhan_231e85b6.m4a',
   // Nota interaktif ms 4
-  nota4Larangan: '/assets/aistudio/nota interaktif halaman 4 jenis kata larangan.m4a',
-  nota4Permintaan: '/assets/aistudio/nota interaktif halaman 4 jenis kata perintah permintaan .m4a',
-  nota4Silaan: '/assets/aistudio/nota interaktif halaman 4 jenis kata silaan.m4a',
-  nota4Suruhan: '/assets/aistudio/nota interaktif halaman 4 jenis kata suruhan.m4a'
+  nota4Larangan: '/assets/aistudio/nota_interaktif_halaman_4_jenis_kata_larangan_34d29fe2.m4a',
+  nota4Permintaan: '/assets/aistudio/nota_interaktif_halaman_4_jenis_kata_perintah_permintaan__bfdb0d28.m4a',
+  nota4Silaan: '/assets/aistudio/nota_interaktif_halaman_4_jenis_kata_silaan_7e3b7a72.m4a',
+  nota4Suruhan: '/assets/aistudio/nota_interaktif_halaman_4_jenis_kata_suruhan_dd6fce5c.m4a'
 };
 
 class SoundController {
@@ -902,63 +902,165 @@ class SoundController {
   public getSyafiqahAudioForText(text: string): string | null {
     if (!text) return null;
     const t = text.toLowerCase();
-    if (t.includes('saya cikgu syafiqah') || (t.includes('cikgu syafiqah') && t.includes('belajar ayat perintah'))) {
+    
+    // 1. Selamat Datang
+    if (
+      t.includes('saya cikgu syafiqah') ||
+      (t.includes('cikgu syafiqah') && t.includes('belajar')) ||
+      t.includes('jom belajar ayat perintah bersama cikgu')
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.welcome;
     }
-    if (t.includes('bagaimana perasaan kamu hari ini') || t.includes('perasaan kamu hari ini')) {
+
+    // 2. Emosi & Perasaan
+    if (
+      t.includes('perasaan kamu hari ini') ||
+      t.includes('cikgu nak tanya') ||
+      t.includes('muka gembira atau perlukan semangat')
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.emotion;
     }
-    if (t.includes('halaman utama') && t.includes('syafiqah')) {
-      return CIKGU_SYAFIQAH_AUDIOS.halamanUtama;
-    }
-    if (t.includes('pilihan permainan') || (t.includes('permainan') && t.includes('syafiqah'))) {
-      return CIKGU_SYAFIQAH_AUDIOS.pilihanPermainan;
-    }
-    if (t.includes('video pembelajaran') || (t.includes('video') && t.includes('syafiqah'))) {
-      return CIKGU_SYAFIQAH_AUDIOS.videoPembelajaran;
-    }
-    if (t.includes('latih diri') && t.includes('syafiqah')) {
-      return CIKGU_SYAFIQAH_AUDIOS.latihDiri;
-    }
-    if (t.includes('panduan navigasi') || t.includes('navigasi')) {
+
+    // 3. Panduan Navigasi / 6 Makna Simbol
+    if (
+      t.includes('makna 6 simbol') ||
+      t.includes('makna enam simbol') ||
+      t.includes('panduan navigasi') ||
+      t.includes('mengemudi kit inovasi')
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.panduanNavigasi;
     }
-    if (t.includes('sasaran kita') || t.includes('4 jenis ayat perintah dengan tepat')) {
+
+    // 4. Halaman Utama
+    if (
+      (t.includes('butang pengenalan') && (t.includes('jom belajar') || t.includes('kuiz'))) ||
+      t.includes('pengembaraan ilmu anda') ||
+      (t.includes('halaman utama') && t.includes('syafiqah'))
+    ) {
+      return CIKGU_SYAFIQAH_AUDIOS.halamanUtama;
+    }
+
+    // 5. Sasaran / Standard Pembelajaran
+    if (
+      t.includes('sasaran kita') ||
+      t.includes('kuasai 4 jenis ayat perintah dengan tepat') ||
+      t.includes('kuasai empat jenis ayat perintah')
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.sasaran;
     }
-    if (t.includes('bahagian yang ingin anda terokai')) {
+
+    // 6. Menu Pilihan Pembelajaran
+    if (
+      t.includes('ingin anda terokai') ||
+      t.includes('bahagian yang ingin anda terokai') ||
+      (t.includes('terokai') && t.includes('syafiqah'))
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.terokai;
     }
+
+    // 7. Pilihan Permainan / Kuiz Hub
+    if (
+      t.includes('pilihan permainan') ||
+      t.includes('pilih permainan kegemaran') ||
+      t.includes('syiling emas')
+    ) {
+      return CIKGU_SYAFIQAH_AUDIOS.pilihanPermainan;
+    }
+
+    // 8. Halaman Video Pembelajaran
+    if (
+      t.includes('silaan dan permintaan mencerminkan pekerti mulia') ||
+      t.includes('pekerti mulia') ||
+      (t.includes('video pembelajaran') && t.includes('syafiqah'))
+    ) {
+      return CIKGU_SYAFIQAH_AUDIOS.videoPembelajaran;
+    }
+
+    // 9. Latih Diri (Mendengar & Bertutur)
+    if (
+      t.includes('anda memilih mod mendengar dan bertutur') ||
+      t.includes('secara lisan bersama cikgu syafiqah') ||
+      (t.includes('latih diri') && t.includes('syafiqah'))
+    ) {
+      return CIKGU_SYAFIQAH_AUDIOS.latihDiri;
+    }
+
+    // 10. Definisi: Menimbulkan Sesuatu Tindakan
     if (t.includes('menimbulkan sesuatu tindakan')) {
       return CIKGU_SYAFIQAH_AUDIOS.definisiTindakan;
     }
+
+    // 11. Konsep: Ditujukan kepada Orang Kedua
     if (t.includes('orang kedua') || t.includes('kata ganti nama orang kedua')) {
       return CIKGU_SYAFIQAH_AUDIOS.orangKedua;
     }
-    if (t.includes('jenis ayat larangan') || (t.includes('halaman 3') && t.includes('larangan'))) {
+
+    // 12. Nota Interaktif Halaman 3: Jenis Ayat Larangan
+    if (
+      (t.includes('ayat larangan') && (t.includes('menegah') || t.includes('jangan buang sampah') || t.includes('halaman 3'))) ||
+      t.includes('jangan buang sampah kamu di sini')
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.nota3Larangan;
     }
-    if (t.includes('jenis ayat permintaan') || (t.includes('halaman 3') && t.includes('permintaan'))) {
+
+    // 13. Nota Interaktif Halaman 3: Jenis Ayat Permintaan
+    if (
+      (t.includes('ayat permintaan') && (t.includes('memohon permintaan') || t.includes('pertolongan') || t.includes('tolong tutup suis') || t.includes('halaman 3'))) ||
+      t.includes('tolong tutup suis lampu')
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.nota3Permintaan;
     }
-    if (t.includes('jenis ayat silaan') || (t.includes('halaman 3') && t.includes('silaan'))) {
+
+    // 14. Nota Interaktif Halaman 3: Jenis Ayat Silaan
+    if (
+      (t.includes('ayat silaan') && (t.includes('mempersilakan') || t.includes('menjemput') || t.includes('kerusi hadapan') || t.includes('halaman 3'))) ||
+      t.includes('sila duduk di kerusi hadapan')
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.nota3Silaan;
     }
-    if (t.includes('jenis ayat suruhan') || (t.includes('halaman 3') && t.includes('suruhan'))) {
+
+    // 15. Nota Interaktif Halaman 3: Jenis Ayat Suruhan
+    if (
+      (t.includes('ayat suruhan') && (t.includes('memberi perintah') || t.includes('kemas bilik tidur') || t.includes('arahan') || t.includes('halaman 3'))) ||
+      t.includes('kemas bilik tidur kamu sekarang')
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.nota3Suruhan;
     }
-    if (t.includes('kata larangan') || (t.includes('halaman 4') && t.includes('larangan'))) {
+
+    // 16. Nota Interaktif Halaman 4: Kata Larangan
+    if (
+      t.includes('jangan dan usah') ||
+      (t.includes('kata larangan') && (t.includes('halaman 4') || t.includes('contoh') || t.includes('jangan')))
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.nota4Larangan;
     }
-    if (t.includes('kata perintah permintaan') || (t.includes('halaman 4') && t.includes('permintaan'))) {
+
+    // 17. Nota Interaktif Halaman 4: Kata Perintah Permintaan
+    if (
+      t.includes('tolong, harap, dan minta') ||
+      t.includes('tolong, harap dan minta') ||
+      (t.includes('kata') && t.includes('permintaan') && (t.includes('tolong') || t.includes('harap') || t.includes('minta')))
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.nota4Permintaan;
     }
-    if (t.includes('kata silaan') || (t.includes('halaman 4') && t.includes('silaan'))) {
+
+    // 18. Nota Interaktif Halaman 4: Kata Silaan
+    if (
+      t.includes('sila dan jemput') ||
+      (t.includes('kata silaan') && (t.includes('sila') || t.includes('jemput') || t.includes('halaman 4')))
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.nota4Silaan;
     }
-    if (t.includes('kata suruhan') || (t.includes('halaman 4') && t.includes('suruhan'))) {
+
+    // 19. Nota Interaktif Halaman 4: Kata Suruhan
+    if (
+      t.includes('imbuhan akhiran') ||
+      t.includes('makanlah atau tutupkan') ||
+      (t.includes('kata suruhan') && (t.includes('imbuhan') || t.includes('partikel') || t.includes('lah')))
+    ) {
       return CIKGU_SYAFIQAH_AUDIOS.nota4Suruhan;
     }
+
     return null;
   }
 

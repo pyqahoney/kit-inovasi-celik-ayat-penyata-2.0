@@ -3,8 +3,9 @@ import { TopNavBar, WoodArrowButton, AudioSpeakerButton } from './OrganicNav';
 import { CikguVector, CatVector } from './IllustratedCharacters';
 import { MotherAndDaughterVector, PolarBearAndBoardCat, EmotiveShapeMascot, BlueBirdVector } from './StoryGraphics';
 import { Play, Pause, RotateCcw, Sparkles, Volume2, BookOpen } from 'lucide-react';
-import { sound, CIKGU_FRESHCY_AUDIOS } from '../utils/audio';
+import { sound, CIKGU_FRESHCY_AUDIOS, CIKGU_SYAFIQAH_AUDIOS } from '../utils/audio';
 import { TeaterDramaVideo } from './TeaterDramaVideo';
+import { TeacherId } from './TeacherCharacters';
 
 interface NotaDanVideoProps {
   initialSubTab?: 'nota' | 'video' | 'teater';
@@ -12,6 +13,7 @@ interface NotaDanVideoProps {
   onHome?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  teacherId?: TeacherId;
 }
 
 export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
@@ -19,7 +21,8 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
   onBack,
   onHome,
   soundEnabled,
-  onToggleSound
+  onToggleSound,
+  teacherId = 'syafiqah'
 }) => {
   // Page index within notes (0 to 6):
   // 0: Definisi Ayat Perintah (Page 8)
@@ -111,7 +114,12 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                   <p className="text-lg sm:text-xl font-heading font-bold text-amber-900 leading-snug">
                     Ayat yang digunakan untuk menimbulkan sesuatu tindakan
                   </p>
-                  <AudioSpeakerButton textToSpeak="Ayat yang digunakan untuk menimbulkan sesuatu tindakan." size="sm" />
+                  <AudioSpeakerButton
+                    textToSpeak="Ayat yang digunakan untuk menimbulkan sesuatu tindakan."
+                    audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.definisiTindakan : undefined}
+                    persona={teacherId}
+                    size="sm"
+                  />
                 </div>
               </div>
 
@@ -120,7 +128,12 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                   <p className="text-lg sm:text-xl font-heading font-bold text-amber-900 leading-snug">
                     Perintah ditujukan kepada orang kedua menggunakan kata ganti nama orang kedua
                   </p>
-                  <AudioSpeakerButton textToSpeak="Perintah ditujukan kepada orang kedua menggunakan kata ganti nama orang kedua." size="sm" />
+                  <AudioSpeakerButton
+                    textToSpeak="Perintah ditujukan kepada orang kedua menggunakan kata ganti nama orang kedua."
+                    audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.orangKedua : undefined}
+                    persona={teacherId}
+                    size="sm"
+                  />
                 </div>
               </div>
             </div>
@@ -222,7 +235,12 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                   <span>🤝</span>
                   <span>Ayat Permintaan</span>
                 </h3>
-                <AudioSpeakerButton textToSpeak="Ayat permintaan: Ayat yang menggunakan kata permintaan dengan tujuan memohon permintaan dan pertolongan." size="sm" />
+                <AudioSpeakerButton
+                  textToSpeak="Ayat permintaan merupakan ayat yang menggunakan kata permintaan dengan tujuan memohon permintaan dan pertolongan. Contohnya: Tolong tutup suis lampu itu."
+                  audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.nota3Permintaan : undefined}
+                  persona={teacherId}
+                  size="sm"
+                />
               </div>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                 Ayat yang menggunakan kata permintaan dengan tujuan memohon permintaan dan pertolongan.
@@ -238,7 +256,12 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                   <span>📢</span>
                   <span>Ayat Suruhan</span>
                 </h3>
-                <AudioSpeakerButton textToSpeak="Ayat suruhan: Ayat yang digunakan dengan tujuan memberi perintah atau arahan sesuatu tindakan." size="sm" />
+                <AudioSpeakerButton
+                  textToSpeak="Ayat suruhan merupakan ayat yang digunakan dengan tujuan memberi perintah atau arahan sesuatu tindakan. Contohnya: Kemas bilik tidur kamu sekarang?"
+                  audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.nota3Suruhan : undefined}
+                  persona={teacherId}
+                  size="sm"
+                />
               </div>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                 Ayat yang digunakan dengan tujuan memberi perintah atau arahan sesuatu tindakan.
@@ -254,13 +277,18 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                   <span>🚫</span>
                   <span>Ayat Larangan</span>
                 </h3>
-                <AudioSpeakerButton textToSpeak="Ayat larangan: Ayat yang menggunakan kata larangan dengan tujuan menegah seseorang melakukan sesuatu." size="sm" />
+                <AudioSpeakerButton
+                  textToSpeak="Ayat larangan merupakan ayat yang menggunakan kata larangan dengan tujuan menegah seseorang melakukan sesuatu. Contohnya: Jangan buang sampah kamu di sini."
+                  audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.nota3Larangan : undefined}
+                  persona={teacherId}
+                  size="sm"
+                />
               </div>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                 Ayat yang menggunakan kata larangan dengan tujuan menegah seseorang melakukan sesuatu.
               </p>
               <div className="mt-2 pt-2 border-t border-rose-200/80 text-[11px] font-bold text-rose-800">
-                Contoh: <em>“Jangan buang sampah di sini.”</em>
+                Contoh: <em>“Jangan buang sampah kamu di sini.”</em>
               </div>
             </div>
 
@@ -270,7 +298,12 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                   <span>🌸</span>
                   <span>Ayat Silaan</span>
                 </h3>
-                <AudioSpeakerButton textToSpeak="Ayat silaan: Ayat yang menggunakan kata silaan sebelum kata kerja dengan tujuan menjemput atau mempersilakan seseorang." size="sm" />
+                <AudioSpeakerButton
+                  textToSpeak="Ayat silaan merupakan ayat yang menggunakan kata silaan sebelum kata kerja dengan tujuan menjemput atau mempersilakan seseorang. Contohnya: Sila duduk di kerusi hadapan."
+                  audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.nota3Silaan : undefined}
+                  persona={teacherId}
+                  size="sm"
+                />
               </div>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                 Ayat yang menggunakan kata silaan sebelum kata kerja dengan tujuan menjemput atau mempersilakan seseorang.
@@ -303,7 +336,12 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
               <div className="flex items-center justify-between mb-1">
                 <span className="font-heading font-bold text-sm sm:text-base text-amber-900">Kata permintaan</span>
                 <div className="flex items-center gap-1">
-                  <AudioSpeakerButton textToSpeak="Kata permintaan: tolong, harap, minta." size="sm" />
+                  <AudioSpeakerButton
+                    textToSpeak="Contoh kata perintah permintaan: tolong, harap, dan minta."
+                    audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.nota4Permintaan : undefined}
+                    persona={teacherId}
+                    size="sm"
+                  />
                   <EmotiveShapeMascot shape="oval" size={42} />
                 </div>
               </div>
@@ -322,7 +360,12 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
               <div className="flex items-center justify-between mb-1">
                 <span className="font-heading font-bold text-sm sm:text-base text-emerald-900">Kata suruhan</span>
                 <div className="flex items-center gap-1">
-                  <AudioSpeakerButton textToSpeak="Kata suruhan menggunakan imbuhan partikel penegas lah." size="sm" />
+                  <AudioSpeakerButton
+                    textToSpeak="Kata suruhan menambah imbuhan akhiran -lah dan -kan selepas kata kerja. Contohnya: makanlah atau tutupkan. Terdapat ayat perintah yang tidak mempunyai kata suruhan, tetapi ayat tersebut bertujuan untuk menimbulkan tindakan terus."
+                    audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.nota4Suruhan : undefined}
+                    persona={teacherId}
+                    size="sm"
+                  />
                   <EmotiveShapeMascot shape="triangle" size={42} />
                 </div>
               </div>
@@ -341,7 +384,12 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
               <div className="flex items-center justify-between mb-1">
                 <span className="font-heading font-bold text-sm sm:text-base text-rose-900">Kata larangan</span>
                 <div className="flex items-center gap-1">
-                  <AudioSpeakerButton textToSpeak="Kata larangan seperti jangan dan usah menegah sesuatu perbuatan yang tidak selamat." size="sm" />
+                  <AudioSpeakerButton
+                    textToSpeak="Contoh kata larangan ialah jangan dan usah."
+                    audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.nota4Larangan : undefined}
+                    persona={teacherId}
+                    size="sm"
+                  />
                   <EmotiveShapeMascot shape="circle" size={42} />
                 </div>
               </div>
@@ -359,7 +407,12 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
               <div className="flex items-center justify-between mb-1">
                 <span className="font-heading font-bold text-sm sm:text-base text-sky-900">Kata silaan</span>
                 <div className="flex items-center gap-1">
-                  <AudioSpeakerButton textToSpeak="Kata silaan: sila, jemput." size="sm" />
+                  <AudioSpeakerButton
+                    textToSpeak="Contoh kata silaan ialah sila dan jemput."
+                    audioUrl={teacherId === 'syafiqah' ? CIKGU_SYAFIQAH_AUDIOS.nota4Silaan : undefined}
+                    persona={teacherId}
+                    size="sm"
+                  />
                   <EmotiveShapeMascot shape="square" size={42} />
                 </div>
               </div>
@@ -554,10 +607,7 @@ export const NotaDanVideo: React.FC<NotaDanVideoProps> = ({
                     <button
                       onClick={() => {
                         sound.playClick();
-                        sound.speakMalay(
-                          'Salam sejahtera! Saya Cikgu Syafiqah. Ayat silaan dan permintaan mencerminkan pekerti mulia kita. Gunakan kata sila, jemput dan tolong dengan santun.',
-                          'syafiqah'
-                        );
+                        sound.playAudioClip(CIKGU_SYAFIQAH_AUDIOS.videoPembelajaran);
                       }}
                       className="w-full py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold flex items-center justify-center gap-1 active:scale-95 transition-all shadow-xs cursor-pointer"
                     >

@@ -319,12 +319,13 @@ export const GoldenPlayButton: React.FC<{
 
 // Cute Speaker Button for Malay Speech & Read-Aloud
 export const AudioSpeakerButton: React.FC<{
-  textToSpeak: string;
+  textToSpeak?: string;
+  audioUrl?: string;
   size?: 'sm' | 'md' | 'lg';
   label?: string;
   className?: string;
   persona?: 'syafiqah' | 'aaron' | 'freshcy' | 'neutral';
-}> = ({ textToSpeak, size = 'md', label, className = '', persona }) => {
+}> = ({ textToSpeak = '', audioUrl, size = 'md', label, className = '', persona }) => {
   const [speaking, setSpeaking] = React.useState(false);
 
   React.useEffect(() => {
@@ -338,7 +339,12 @@ export const AudioSpeakerButton: React.FC<{
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    sound.speakMalay(textToSpeak, persona);
+    if (audioUrl) {
+      sound.playClick();
+      sound.playAudioClip(audioUrl);
+    } else {
+      sound.speakMalay(textToSpeak, persona);
+    }
   };
 
   const sizeClasses = {

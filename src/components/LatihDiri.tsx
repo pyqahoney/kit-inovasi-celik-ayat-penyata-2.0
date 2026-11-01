@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { TopNavBar, WoodArrowButton } from './OrganicNav';
-import { sound, CIKGU_FRESHCY_AUDIOS } from '../utils/audio';
+import { sound, CIKGU_FRESHCY_AUDIOS, CIKGU_SYAFIQAH_AUDIOS } from '../utils/audio';
 import { TeacherStandee, TeacherId, TEACHER_PROFILES } from './TeacherCharacters';
 import { BoyVector } from './IllustratedCharacters';
 import { FoliageForeground } from './StoryGraphics';
@@ -681,7 +681,11 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
             sound.playClick();
             setMode('lisan');
             if (step === 'intro') {
-              sound.playAudioClip(CIKGU_FRESHCY_AUDIOS.oralIntro);
+              if (teacherId === 'syafiqah') {
+                sound.playAudioClip(CIKGU_SYAFIQAH_AUDIOS.latihDiri);
+              } else if (teacherId === 'freshcy') {
+                sound.playAudioClip(CIKGU_FRESHCY_AUDIOS.oralIntro);
+              }
             }
           }}
           className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-2xl text-xs sm:text-sm font-heading font-black transition-all cursor-pointer ${
@@ -714,14 +718,20 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
               size="lg"
               showBubble={true}
               audioUrl={
-                mode === 'ar'
-                  ? CIKGU_FRESHCY_AUDIOS.arIntro
-                  : mode === 'lisan'
-                  ? CIKGU_FRESHCY_AUDIOS.oralIntro
-                  : CIKGU_FRESHCY_AUDIOS.writtenIntro
+                teacherId === 'syafiqah'
+                  ? CIKGU_SYAFIQAH_AUDIOS.latihDiri
+                  : teacherId === 'freshcy'
+                  ? mode === 'ar'
+                    ? CIKGU_FRESHCY_AUDIOS.arIntro
+                    : mode === 'lisan'
+                    ? CIKGU_FRESHCY_AUDIOS.oralIntro
+                    : CIKGU_FRESHCY_AUDIOS.writtenIntro
+                  : undefined
               }
               bubbleText={
-                mode === 'ar'
+                teacherId === 'syafiqah'
+                  ? '“Anda memilih mod mendengar dan bertutur. Dengar audio soalan dan berikan jawapan secara lisan bersama Cikgu Syafiqah.”'
+                  : mode === 'ar'
                   ? `“Anda memilih Mod AR! Tunjukkan emoji bentuk tangan di hadapan kamera untuk menjawab soalan bersama ${TEACHER_PROFILES[teacherId].nama}!”`
                   : mode === 'lisan'
                   ? `“Anda memilih Mod Mendengar dan Bertutur! Dengar audio soalan dan berikan jawapan secara lisan bersama ${TEACHER_PROFILES[teacherId].nama}!”`
