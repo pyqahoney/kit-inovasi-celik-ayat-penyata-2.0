@@ -177,7 +177,7 @@ export const TeacherStandee: React.FC<TeacherStandeeProps> = ({
               onClick={(e) => {
                 e.stopPropagation();
                 sound.playClick();
-                if (audioUrl) {
+                if (audioUrl && profile.id === 'freshcy') {
                   sound.playAudioClip(audioUrl);
                 } else {
                   const speechText = bubbleText || profile.ucapanMesra;

@@ -125,8 +125,11 @@ export const FrogGame: React.FC<FrogGameProps> = ({
   // Real-world hand detection states (TIDAK Sensitif Warna Kulit - Detect Tangan Sahaja)
   const [detectedHandZone, setDetectedHandZone] = useState<'A' | 'B' | 'C' | null>(null);
   const [handDwellProgress, setHandDwellProgress] = useState<number>(0);
+  const [arTimeLeft, setArTimeLeft] = useState<number>(15);
+  const [isHandPresent, setIsHandPresent] = useState<boolean>(false);
   const analyzerCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const prevFrameDataRef = useRef<Uint8ClampedArray | null>(null);
+  const bgLumRef = useRef<Float32Array | null>(null);
 
   // Oral Mode (Mod Mendengar dan Bertutur) States
   const [oralMode, setOralMode] = useState<boolean>(false);
@@ -447,16 +450,48 @@ export const FrogGame: React.FC<FrogGameProps> = ({
     }, 400);
   };
 
-  // Real-Time Optical Hand Tracking in Real World (TIDAK Sensitif Warna Kulit - Detect Tangan Sahaja)
+  // 15-Second AR Hand Gesture Countdown Timer
+  useEffect(() => {
+    if (!arMode || answerState !== 'idle' || subStage !== 'playing') {
+      return;
+    }
+    setArTimeLeft(15);
+    const timer = setInterval(() => {
+      setArTimeLeft((prev) => {
+        if (prev <= 1) {
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [arMode, currentIdx, answerState, subStage]);
+
+  // When 15 seconds expire in AR mode
+  useEffect(() => {
+    if (arMode && arTimeLeft === 0 && answerState === 'idle') {
+      if (detectedHandZone) {
+        sound.playCoin();
+        handleSelectLeaf(detectedHandZone);
+      } else {
+        sound.speakMalay('Masa 15 saat telah tamat. Sila tunjuk simbol tangan sekali lagi!');
+        setArTimeLeft(15);
+      }
+    }
+  }, [arTimeLeft, arMode, answerState, detectedHandZone]);
+
+  // Real-Time Optical Hand Tracking in Real World (TIDAK Sensitif Warna Kulit - Detect Tangan Sahaja dalam Kotak)
   useEffect(() => {
     if (!arMode || !cameraActive || answerState !== 'idle' || subStage !== 'playing') {
       setDetectedHandZone(null);
+      setIsHandPresent(false);
       setHandDwellProgress(0);
       return;
     }
 
-    let dwellCount = 0;
-    let targetZone: 'A' | 'B' | 'C' | null = null;
+    let stableCount = 0;
+    let candidateZone: 'A' | 'B' | 'C' | null = null;
 
     const interval = setInterval(() => {
       const video = videoRef.current;
@@ -470,84 +505,125 @@ export const FrogGame: React.FC<FrogGameProps> = ({
       ctx.drawImage(video, 0, 0, 160, 120);
       const frame = ctx.getImageData(0, 0, 160, 120);
       const data = frame.data;
+      const totalPixels = 160 * 120;
+
+      // Inisialisasi atau kemas kini baseline latar belakang bilik
+      if (!bgLumRef.current || bgLumRef.current.length !== totalPixels) {
+        bgLumRef.current = new Float32Array(totalPixels);
+        for (let i = 0; i < totalPixels; i++) {
+          const pi = i * 4;
+          bgLumRef.current[i] = 0.299 * data[pi] + 0.587 * data[pi + 1] + 0.114 * data[pi + 2];
+        }
+        return;
+      }
+
+      const bg = bgLumRef.current;
+
+      // KOTAK SASARAN TANGAN KHAS: Hanya imbas kawasan tengah ini (Mengabaikan muka & badan)
+      const boxX1 = 28;
+      const boxX2 = 132;
+      const boxY1 = 18;
+      const boxY2 = 104;
+
+      const colW = (boxX2 - boxX1) / 3;
+      const col1End = boxX1 + colW;
+      const col2End = boxX1 + colW * 2;
+      const midY = boxY1 + (boxY2 - boxY1) * 0.52;
+
+      let totalOccupancy = 0;
+      let motionScore = 0;
+
+      let upperLeft = 0;
+      let upperMid = 0;
+      let upperRight = 0;
+
+      let lowerLeft = 0;
+      let lowerMid = 0;
+      let lowerRight = 0;
+
       const prevData = prevFrameDataRef.current;
 
-      let scoreA = 0;
-      let scoreB = 0;
-      let scoreC = 0;
+      for (let y = boxY1; y <= boxY2; y += 2) {
+        for (let x = boxX1; x <= boxX2; x += 2) {
+          const pixelIdx = y * 160 + x;
+          const idx = pixelIdx * 4;
 
-      if (prevData) {
-        for (let y = 15; y < 110; y += 4) {
-          for (let x = 15; x < 145; x += 4) {
-            const idx = (y * 160 + x) * 4;
-            // Gunakan perbezaan luminans (pantulan cahaya tangan) - tidak bergantung pada warna kulit
-            const curLum = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+          const curLum = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+          const bgLum = bg[pixelIdx];
+          const diffBg = Math.abs(curLum - bgLum);
+
+          if (prevData) {
             const prevLum = 0.299 * prevData[idx] + 0.587 * prevData[idx + 1] + 0.114 * prevData[idx + 2];
-            const diff = Math.abs(curLum - prevLum);
-
-            // Fokus pada pergerakan fizikal tangan yang jelas di zon daun (Bukan warna kulit)
-            const weight = diff > 20 ? 2 : (diff > 12 ? 1 : 0);
-
-            if (weight > 0) {
-              if (x >= 15 && x <= 55 && y >= 45) {
-                scoreA += weight;
-              } else if (x >= 55 && x <= 105 && y <= 60) {
-                scoreB += weight;
-              } else if (x >= 105 && x <= 150 && y >= 45) {
-                scoreC += weight;
-              }
+            if (Math.abs(curLum - prevLum) > 16) {
+              motionScore++;
             }
+          }
+
+          if (diffBg > 18) {
+            totalOccupancy++;
+            if (y < midY) {
+              if (x < col1End) upperLeft++;
+              else if (x < col2End) upperMid++;
+              else upperRight++;
+            } else {
+              if (x < col1End) lowerLeft++;
+              else if (x < col2End) lowerMid++;
+              else lowerRight++;
+            }
+          } else {
+            bg[pixelIdx] = 0.98 * bgLum + 0.02 * curLum;
           }
         }
       }
 
       prevFrameDataRef.current = new Uint8ClampedArray(data);
 
-      const threshold = 12;
-      let foundZone: 'A' | 'B' | 'C' | null = null;
-      let maxScore = threshold;
+      const handPresent = totalOccupancy >= 22 || motionScore >= 16;
+      setIsHandPresent(handPresent);
 
-      if (scoreA > maxScore) {
-        foundZone = 'A';
-        maxScore = scoreA;
-      }
-      if (scoreB > maxScore) {
-        foundZone = 'B';
-        maxScore = scoreB;
-      }
-      if (scoreC > maxScore) {
-        foundZone = 'C';
-        maxScore = scoreC;
-      }
+      if (handPresent) {
+        const totalUpper = upperLeft + upperMid + upperRight;
 
-      if (foundZone) {
-        setDetectedHandZone(foundZone);
-        if (targetZone === foundZone) {
-          dwellCount += 1;
-          const progress = Math.min(100, Math.round((dwellCount / 4) * 100));
-          setHandDwellProgress(progress);
+        // Pengecaman 3 Simbol Tangan:
+        // 1. Daun C = ✋ (Tangan Terbuka): Kawasan okupansi luas ketiga-tiga kolum
+        const isBroadHand =
+          upperLeft >= 7 &&
+          upperMid >= 7 &&
+          upperRight >= 7 &&
+          totalUpper >= 32;
 
-          if (dwellCount >= 4) {
-            // Hand locked onto zone!
-            sound.playCoin();
-            handleSelectLeaf(foundZone);
-            dwellCount = 0;
-            setHandDwellProgress(0);
+        // 2. Daun B = ✌️ (2 Jari / Peace): Dua kolum berasingan
+        const isTwoFingers =
+          !isBroadHand &&
+          ((upperLeft >= 6 && upperRight >= 6) ||
+           (upperLeft >= 7 && upperMid >= 7 && upperRight <= 5) ||
+           (upperMid >= 7 && upperRight >= 7 && upperLeft <= 5));
+
+        let detected: 'A' | 'B' | 'C' = 'A'; // Daun A = ☝️ (1 Jari Telunjuk)
+
+        if (isBroadHand) {
+          detected = 'C';
+        } else if (isTwoFingers) {
+          detected = 'B';
+        } else {
+          detected = 'A';
+        }
+
+        if (detected === candidateZone) {
+          stableCount++;
+          if (stableCount >= 2) {
+            setDetectedHandZone(detected);
+            setHandDwellProgress(100);
           }
         } else {
-          targetZone = foundZone;
-          dwellCount = 1;
-          setHandDwellProgress(25);
+          candidateZone = detected;
+          stableCount = 1;
+          setHandDwellProgress(50);
         }
       } else {
-        dwellCount = Math.max(0, dwellCount - 1);
-        if (dwellCount === 0) {
-          setDetectedHandZone(null);
-          setHandDwellProgress(0);
-          targetZone = null;
-        }
+        stableCount = 0;
       }
-    }, 150);
+    }, 120);
 
     return () => clearInterval(interval);
   }, [arMode, cameraActive, answerState, subStage, currentIdx]);
@@ -932,24 +1008,62 @@ export const FrogGame: React.FC<FrogGameProps> = ({
                 {/* Hidden canvas for real-time optical hand tracking */}
                 <canvas ref={analyzerCanvasRef} width={160} height={120} className="hidden" />
 
-                {/* Real-World Hand Detection Guidance Banner */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 max-w-sm w-10/12 text-center pointer-events-none">
-                  <div className={`px-3 py-1.5 rounded-2xl border-2 backdrop-blur-md shadow-lg transition-all flex items-center justify-center gap-2 ${
+                {/* 15-Second Timer Bar & Real-World Hand Detection Guidance Banner */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 max-w-md w-11/12 text-center pointer-events-auto flex flex-col items-center gap-1.5">
+                  {/* 15-Second Countdown Pill */}
+                  <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/85 border-2 border-yellow-400 text-yellow-300 shadow-xl backdrop-blur-md">
+                    <span className="text-base animate-pulse">⏳</span>
+                    <span className="text-xs font-heading font-black">
+                      Masa Menunjukkan Isyarat: <strong className="text-sm text-yellow-200">{arTimeLeft}s</strong>
+                    </span>
+                    <div className="w-20 sm:w-28 h-2 bg-slate-700 rounded-full overflow-hidden border border-yellow-500/60">
+                      <div
+                        className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 transition-all duration-1000"
+                        style={{ width: `${(arTimeLeft / 15) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Status Banner */}
+                  <div className={`px-3 py-1 rounded-2xl border backdrop-blur-md shadow-lg transition-all flex items-center justify-center gap-2 text-xs font-heading font-black ${
                     detectedHandZone
                       ? 'bg-emerald-950/90 border-emerald-400 text-emerald-200 animate-pulse'
                       : 'bg-black/75 border-amber-400/80 text-amber-200'
                   }`}>
-                    <span className="text-lg">🖐️</span>
-                    <div className="text-left leading-tight">
-                      <span className="text-[10px] sm:text-xs font-heading font-black block">
-                        {detectedHandZone
-                          ? `Tangan dikesan pada Teratai ${detectedHandZone}! (${handDwellProgress}%)`
-                          : 'Tunjukkan tangan di hadapan kamera pada daun teratai!'}
-                      </span>
-                      <span className="text-[8px] sm:text-[9px] text-emerald-300 font-mono block">
-                        Pengesan tangan optikal (bukan warna kulit) · Halakan tangan ke Daun A, B atau C
-                      </span>
-                    </div>
+                    <span>{detectedHandZone ? (detectedHandZone === 'A' ? '☝️' : detectedHandZone === 'B' ? '✌️' : '✋') : '✋'}</span>
+                    <span>
+                      {detectedHandZone
+                        ? `Dikesan: Daun ${detectedHandZone} (${detectedHandZone === 'A' ? '☝️ Telunjuk' : detectedHandZone === 'B' ? '✌️ Dua Jari' : '✋ Tangan Terbuka'})`
+                        : 'Tunjukkan simbol tangan dalam kotak sasaran'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* KOTAK SASARAN TANGAN (Imbas tangan sahaja dalam kotak, bukan anggota badan lain) */}
+                <div
+                  className={`absolute top-[18%] left-[24%] sm:left-[28%] w-[52%] sm:w-[44%] h-[50%] rounded-3xl border-3 border-dashed transition-all pointer-events-none z-20 flex flex-col items-center justify-between p-2.5 ${
+                    isHandPresent
+                      ? 'border-emerald-400 bg-emerald-500/15 shadow-[0_0_30px_rgba(52,211,153,0.35)]'
+                      : 'border-yellow-300/80 bg-black/25'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-black/85 backdrop-blur-sm border border-white/30 text-white text-[10px] font-heading font-black">
+                    <span>{isHandPresent ? '✨ Tangan Dikesan' : '✋ Kotak Sasaran Tangan'}</span>
+                  </div>
+
+                  <div className="text-center animate-bounce">
+                    <span className="text-4xl block mb-1">
+                      {detectedHandZone === 'A' ? '☝️' : detectedHandZone === 'B' ? '✌️' : detectedHandZone === 'C' ? '✋' : '✋'}
+                    </span>
+                    <span className="text-xs font-heading font-black text-yellow-300 bg-black/80 px-3 py-1 rounded-full border border-yellow-400/60 shadow">
+                      {detectedHandZone
+                        ? `Daun ${detectedHandZone}`
+                        : 'Tunjuk ☝️ Daun A · ✌️ Daun B · ✋ Daun C'}
+                    </span>
+                  </div>
+
+                  <div className="text-[9px] text-white/90 font-bold bg-black/70 px-2 py-0.5 rounded-full border border-white/20">
+                    Kamera hanya mengesan tangan di dalam kotak ini
                   </div>
                 </div>
 
@@ -1301,6 +1415,69 @@ export const FrogGame: React.FC<FrogGameProps> = ({
               </div>
             )}
           </div>
+
+          {/* AR Mode Interactive Gesture Button Bar for Quick Selection & Feedback */}
+          {arMode && answerState === 'idle' && (
+            <div className="flex flex-wrap items-center justify-between gap-2 max-w-2xl mx-auto w-full my-1.5 p-2 rounded-2xl bg-slate-900/90 border-2 border-emerald-400 text-white shadow-xl backdrop-blur-xs">
+              <span className="text-xs font-heading font-black text-amber-300 flex items-center gap-1.5 px-2">
+                <span>✋</span>
+                <span>Pilih Menggunakan Simbol Tangan (15s):</span>
+              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setDetectedHandZone('A');
+                    handleSelectLeaf('A');
+                  }}
+                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-heading font-black transition-all cursor-pointer ${
+                    detectedHandZone === 'A'
+                      ? 'bg-yellow-400 text-slate-950 border-white shadow-md scale-105'
+                      : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                  }`}
+                >
+                  <span className="text-base">☝️</span>
+                  <span>Daun A</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setDetectedHandZone('B');
+                    handleSelectLeaf('B');
+                  }}
+                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-heading font-black transition-all cursor-pointer ${
+                    detectedHandZone === 'B'
+                      ? 'bg-yellow-400 text-slate-950 border-white shadow-md scale-105'
+                      : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                  }`}
+                >
+                  <span className="text-base">✌️</span>
+                  <span>Daun B</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setDetectedHandZone('C');
+                    handleSelectLeaf('C');
+                  }}
+                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-heading font-black transition-all cursor-pointer ${
+                    detectedHandZone === 'C'
+                      ? 'bg-yellow-400 text-slate-950 border-white shadow-md scale-105'
+                      : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                  }`}
+                >
+                  <span className="text-base">✋</span>
+                  <span>Daun C</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

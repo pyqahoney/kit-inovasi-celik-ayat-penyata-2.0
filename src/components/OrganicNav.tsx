@@ -13,6 +13,7 @@ export const TopNavBar: React.FC<{
   className?: string;
 }> = ({ onHome, onExit, onHelp, soundEnabled, onToggleSound, title, className = '' }) => {
   const [showAudioMenu, setShowAudioMenu] = React.useState(false);
+  const [showConfirmHome, setShowConfirmHome] = React.useState(false);
   const [bgmOn, setBgmOn] = React.useState(sound.bgmEnabled);
   const [sfxOn, setSfxOn] = React.useState(sound.sfxEnabled);
 
@@ -44,6 +45,44 @@ export const TopNavBar: React.FC<{
 
   return (
     <div className={`relative flex items-center justify-between w-full px-4 py-2 z-30 ${className}`}>
+      {/* Modal Pengesahan Kembali ke Halaman Utama */}
+      {showConfirmHome && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-amber-50 border-4 border-amber-600 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <div className="w-16 h-16 rounded-full bg-amber-200 border-2 border-amber-400 mx-auto flex items-center justify-center text-3xl mb-3 shadow-inner">
+              🏠
+            </div>
+            <h3 className="font-heading font-black text-lg text-slate-900 mb-2">
+              Kembali ke Halaman Utama?
+            </h3>
+            <p className="text-sm text-slate-700 font-medium mb-6">
+              Adakah anda pasti ingin kembali ke Halaman Utama?
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setShowConfirmHome(false);
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-heading font-bold text-sm cursor-pointer active:scale-95 transition-all"
+              >
+                Tidak
+              </button>
+              <button
+                onClick={() => {
+                  sound.playSuccess();
+                  setShowConfirmHome(false);
+                  if (onHome) onHome();
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-heading font-black text-sm shadow-md cursor-pointer active:scale-95 transition-all"
+              >
+                Ya
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Left side actions */}
       <div className="flex items-center gap-2">
         {onExit && (
@@ -64,7 +103,7 @@ export const TopNavBar: React.FC<{
           <button
             onClick={() => {
               sound.playClick();
-              onHome();
+              setShowConfirmHome(true);
             }}
             aria-label="Laman Utama"
             title="Laman Utama"

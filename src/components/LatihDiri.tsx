@@ -85,6 +85,8 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
   const [qIndex, setQIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [userChoice, setUserChoice] = useState<string | null>(null);
+  const [wrongFeedback, setWrongFeedback] = useState<string | null>(null);
+  const [isWrongShake, setIsWrongShake] = useState<boolean>(false);
 
   // AR States
   const [cameraActive, setCameraActive] = useState<boolean>(false);
@@ -382,39 +384,59 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
     }, 400);
   };
 
-  // Handle AR Grab Action (either by hand hover optical detection or direct tap)
-  const handleGrabChoice = (choice: string) => {
+  // Handle choice selection for both AR gesture/tap and Written Mode
+  const handleSelectChoice = (choice: string) => {
     if (showAnswer) return;
     sound.playClick();
     setGrabbedCard(choice);
     setUserChoice(choice);
 
-    const isCorrect = choice === cur.answer1 || (cur.id === 4 && choice === 'Ayat & kata');
+    const isCorrect = choice === cur.answer1 || (cur.id === 4 && (choice === 'Ayat & kata' || choice.includes('Ayat')));
     if (isCorrect) {
+      setWrongFeedback(null);
+      setIsWrongShake(false);
       setTimeout(() => {
         sound.playApplause();
         setShowAnswer(true);
         try {
           confetti({
-            particleCount: 60,
+            particleCount: 70,
             spread: 70,
             origin: { y: 0.5 }
           });
         } catch {
           // ignore
         }
-      }, 300);
+      }, 250);
     } else {
+      // Wrong answer feedback: Red shake, buzzer sound, device vibration, and retry banner
+      sound.playWrong();
+      setIsWrongShake(true);
+      setWrongFeedback('Jawapan salah, sila cuba lagi.');
+
+      // Device vibration feedback
+      if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        try {
+          navigator.vibrate([200, 100, 200]);
+        } catch {
+          // ignore if vibration disallowed
+        }
+      }
+
       setTimeout(() => {
-        sound.playWrong();
-      }, 300);
+        setIsWrongShake(false);
+      }, 900);
     }
   };
+
+  const handleGrabChoice = handleSelectChoice;
 
   // Reset AR detection state when question or mode changes
   useEffect(() => {
     setDetectedHandIdx(null);
     setIsHandPresent(false);
+    setWrongFeedback(null);
+    setIsWrongShake(false);
     resetOralState();
   }, [qIndex, mode, step]);
 
@@ -726,7 +748,11 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
           {mode === 'ar' ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 my-1 items-stretch flex-1">
               {/* SEBELAH KIRI: Soalan, Pilihan Jawapan & Panduan Bentuk Tangan (7 Kolum) */}
-              <div className="lg:col-span-7 flex flex-col justify-between p-4 sm:p-5 rounded-3xl bg-white/95 border-3 border-purple-400 shadow-xl text-slate-900">
+              <div className={`lg:col-span-7 flex flex-col justify-between p-4 sm:p-5 rounded-3xl bg-white/95 border-3 transition-all ${
+                isWrongShake
+                  ? 'border-rose-500 ring-4 ring-rose-400 bg-rose-50'
+                  : 'border-purple-400'
+              } shadow-xl text-slate-900`}>
                 <div>
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                     <span className="font-heading font-black text-sm sm:text-base text-purple-900">
@@ -740,7 +766,7 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
                             ? 'bg-amber-400 text-amber-950 ring-2 ring-amber-300 animate-pulse'
                             : 'bg-purple-600 hover:bg-purple-700 text-white'
                         }`}
-                        title="Dengar rakaman Cikgu Freshcy membaca soalan ini"
+                        title="Dengar soalan ini"
                       >
                         <Volume2 size={12} />
                         <span>{isSpeakingQuestion ? 'Membaca...' : 'Dengar Soalan 🔊'}</span>
@@ -751,6 +777,14 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
                       </div>
                     </div>
                   </div>
+
+                  {/* Wrong Answer Retry Alert */}
+                  {wrongFeedback && !showAnswer && (
+                    <div className="mb-2 p-2.5 rounded-2xl bg-rose-100 border-2 border-rose-500 text-rose-950 font-heading font-black text-xs sm:text-sm flex items-center justify-center gap-2 animate-bounce shadow-md">
+                      <span>⚠️</span>
+                      <span>{wrongFeedback}</span>
+                    </div>
+                  )}
 
                   {/* Kawalan Isyarat AR Banner on Question Panel */}
                   <div className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-purple-50 border border-purple-300 mb-2 shadow-2xs">
@@ -1210,7 +1244,11 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
             </div>
           ) : (
             /* MOD BIASA: Single Column Standard View */
-            <div className="relative max-w-2xl mx-auto w-full p-5 sm:p-7 rounded-3xl border-3 border-dashed border-amber-400 bg-white/95 shadow-xl text-center z-10 transition-all">
+            <div className={`relative max-w-2xl mx-auto w-full p-5 sm:p-7 rounded-3xl border-3 border-dashed transition-all ${
+              isWrongShake
+                ? 'border-rose-500 ring-4 ring-rose-400 bg-rose-50'
+                : 'border-amber-400 bg-white/95'
+            } shadow-xl text-center z-10`}>
               <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-3">
                 <span className="font-heading font-black text-lg text-amber-800">
                   Soalan {qIndex + 1} daripada {DRILL_QUESTIONS.length}
@@ -1224,7 +1262,7 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
                         ? 'bg-amber-400 text-amber-950 ring-2 ring-amber-300 animate-pulse'
                         : 'bg-amber-500 hover:bg-amber-600 text-white'
                     }`}
-                    title="Dengar rakaman Cikgu Freshcy membaca soalan ini"
+                    title="Dengar soalan ini"
                   >
                     <Volume2 size={13} />
                     <span>{isSpeakingQuestion ? 'Membaca...' : 'Dengar Soalan 🔊'}</span>
@@ -1237,6 +1275,14 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Wrong Answer Alert */}
+              {wrongFeedback && !showAnswer && (
+                <div className="mb-3 p-3 rounded-2xl bg-rose-100 border-2 border-rose-500 text-rose-950 font-heading font-black text-sm flex items-center justify-center gap-2 animate-bounce shadow-md max-w-md mx-auto">
+                  <span>⚠️</span>
+                  <span>{wrongFeedback}</span>
+                </div>
+              )}
 
               {/* Sentence Display */}
               <div className="text-xl sm:text-2xl font-heading font-bold my-4 leading-relaxed text-slate-800">
@@ -1273,11 +1319,12 @@ export const LatihDiri: React.FC<LatihDiriProps> = ({
                   <button
                     key={c}
                     onClick={() => {
-                      sound.playClick();
-                      setUserChoice(c);
+                      handleSelectChoice(c);
                     }}
-                    className={`px-5 py-2.5 rounded-2xl text-sm sm:text-base font-heading font-bold border-2 transition-all cursor-pointer ${
-                      userChoice === c
+                    className={`px-5 py-2.5 rounded-2xl text-sm sm:text-base font-heading font-bold border-2 transition-all cursor-pointer active:scale-95 ${
+                      userChoice === c && showAnswer
+                        ? 'bg-emerald-500 text-white border-emerald-600 scale-105 shadow-md'
+                        : userChoice === c
                         ? 'bg-amber-500 text-white border-amber-600 scale-105 shadow-md'
                         : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300'
                     }`}

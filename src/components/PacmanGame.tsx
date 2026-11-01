@@ -465,10 +465,10 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
         soundEnabled={soundEnabled}
         onToggleSound={onToggleSound}
         onHelp={() => sound.speakMalay("Gunakan anak panah untuk menggerakkan Pac-Man memakan bintik dan bintang kuasa ayat perintah!")}
-        title="Game Kuasa Pac-Man: Labirin Ayat Perintah"
+        title="Permainan Kuasa Pac-Man: Labirin Ayat Perintah"
       />
 
-      {/* Screen 1: Pengenalan Game Kuasa Pac-Man */}
+      {/* Screen 1: Pengenalan Permainan Kuasa Pac-Man */}
       {subStage === 'intro' && (
         <div
           className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-yellow-400 shadow-2xl flex flex-col justify-between p-6 sm:p-8 min-h-[460px] sm:min-h-[500px] select-none animate-fade-in"
@@ -485,7 +485,7 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
 
             <div className="bg-slate-900/95 backdrop-blur-md p-6 rounded-3xl border-4 border-yellow-400 shadow-2xl text-white">
               <h1 className="text-3xl sm:text-4xl font-heading font-black text-yellow-400 drop-shadow-sm uppercase tracking-wide">
-                Game Kuasa Pac-Man
+                Permainan Kuasa Pac-Man
               </h1>
               <span className="inline-block mt-1 px-3 py-1 bg-yellow-400 text-slate-950 rounded-full text-xs font-heading font-black">
                 Misi Labirin: Ayat Perintah
@@ -521,7 +521,7 @@ export const PacmanGame: React.FC<PacmanGameProps> = ({
         </div>
       )}
 
-      {/* Screen 2: Cara Bermain Game Kuasa Pac-Man */}
+      {/* Screen 2: Cara Bermain Permainan Kuasa Pac-Man */}
       {subStage === 'rules' && (
         <div
           className="relative my-2 w-full rounded-3xl overflow-hidden border-4 border-yellow-400 shadow-2xl flex flex-col justify-between p-6 sm:p-8 min-h-[460px] sm:min-h-[500px] select-none animate-fade-in"

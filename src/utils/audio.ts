@@ -34,6 +34,33 @@ export const CIKGU_FRESHCY_AUDIOS = {
   kataLarangan: '/assets/aistudio/Kata_larangan_seperti_jangan_dan_usah_91b420e2.ogg'
 };
 
+/**
+ * Audio Rakaman Suara Cikgu Syafiqah
+ */
+export const CIKGU_SYAFIQAH_AUDIOS = {
+  welcome: '/assets/aistudio/hai! saya cikgu Syafiqah. jom belajar ayat perintah bersama cikgu.m4a',
+  emotion: '/assets/aistudio/hai! cikgu nak tanya, bagaimana perasaan kamu hari ini pilih muka gembira atau perlukan semangat di sebalah ya.m4a',
+  halamanUtama: '/assets/aistudio/halaman utama cikgu Syafiqah .m4a',
+  pilihanPermainan: '/assets/aistudio/halaman pilihan permainan cikgu Syafiqah .m4a',
+  videoPembelajaran: '/assets/aistudio/halaman video pembelajaran cikgu Syafiqah .m4a',
+  latihDiri: '/assets/aistudio/latih diri cikgu Syafiqah .m4a',
+  panduanNavigasi: '/assets/aistudio/panduan navigasi cikgu syafiqah.m4a',
+  sasaran: '/assets/aistudio/sasaran kita kuasai 4 jenis ayat perintah dengan tepat.m4a',
+  terokai: '/assets/aistudio/Sila pilih bahagian yang ingin anda terokai bersama cikgu Syafiqah .m4a',
+  definisiTindakan: '/assets/aistudio/ayat yang digunakan untuk menimbulkan sesuatu tindakan.m4a',
+  orangKedua: '/assets/aistudio/perintah ditujukan kepada orang kedua menggunakan kata ganti nama orang kedua.m4a',
+  // Nota interaktif ms 3
+  nota3Larangan: '/assets/aistudio/nota interaktif halaman 3 jenis ayat larangan .m4a',
+  nota3Permintaan: '/assets/aistudio/nota interaktif halaman 3 jenis ayat permintaan .m4a',
+  nota3Silaan: '/assets/aistudio/nota interaktif halaman 3 jenis ayat silaan.m4a',
+  nota3Suruhan: '/assets/aistudio/nota interaktif halaman 3 jenis ayat suruhan.m4a',
+  // Nota interaktif ms 4
+  nota4Larangan: '/assets/aistudio/nota interaktif halaman 4 jenis kata larangan.m4a',
+  nota4Permintaan: '/assets/aistudio/nota interaktif halaman 4 jenis kata perintah permintaan .m4a',
+  nota4Silaan: '/assets/aistudio/nota interaktif halaman 4 jenis kata silaan.m4a',
+  nota4Suruhan: '/assets/aistudio/nota interaktif halaman 4 jenis kata suruhan.m4a'
+};
+
 class SoundController {
   private audioCtx: AudioContext | null = null;
   public enabled: boolean = true;
@@ -871,8 +898,72 @@ class SoundController {
     return null;
   }
 
+  // Helper to match text to Cikgu Syafiqah audio files
+  public getSyafiqahAudioForText(text: string): string | null {
+    if (!text) return null;
+    const t = text.toLowerCase();
+    if (t.includes('saya cikgu syafiqah') || (t.includes('cikgu syafiqah') && t.includes('belajar ayat perintah'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.welcome;
+    }
+    if (t.includes('bagaimana perasaan kamu hari ini') || t.includes('perasaan kamu hari ini')) {
+      return CIKGU_SYAFIQAH_AUDIOS.emotion;
+    }
+    if (t.includes('halaman utama') && t.includes('syafiqah')) {
+      return CIKGU_SYAFIQAH_AUDIOS.halamanUtama;
+    }
+    if (t.includes('pilihan permainan') || (t.includes('permainan') && t.includes('syafiqah'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.pilihanPermainan;
+    }
+    if (t.includes('video pembelajaran') || (t.includes('video') && t.includes('syafiqah'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.videoPembelajaran;
+    }
+    if (t.includes('latih diri') && t.includes('syafiqah')) {
+      return CIKGU_SYAFIQAH_AUDIOS.latihDiri;
+    }
+    if (t.includes('panduan navigasi') || t.includes('navigasi')) {
+      return CIKGU_SYAFIQAH_AUDIOS.panduanNavigasi;
+    }
+    if (t.includes('sasaran kita') || t.includes('4 jenis ayat perintah dengan tepat')) {
+      return CIKGU_SYAFIQAH_AUDIOS.sasaran;
+    }
+    if (t.includes('bahagian yang ingin anda terokai')) {
+      return CIKGU_SYAFIQAH_AUDIOS.terokai;
+    }
+    if (t.includes('menimbulkan sesuatu tindakan')) {
+      return CIKGU_SYAFIQAH_AUDIOS.definisiTindakan;
+    }
+    if (t.includes('orang kedua') || t.includes('kata ganti nama orang kedua')) {
+      return CIKGU_SYAFIQAH_AUDIOS.orangKedua;
+    }
+    if (t.includes('jenis ayat larangan') || (t.includes('halaman 3') && t.includes('larangan'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.nota3Larangan;
+    }
+    if (t.includes('jenis ayat permintaan') || (t.includes('halaman 3') && t.includes('permintaan'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.nota3Permintaan;
+    }
+    if (t.includes('jenis ayat silaan') || (t.includes('halaman 3') && t.includes('silaan'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.nota3Silaan;
+    }
+    if (t.includes('jenis ayat suruhan') || (t.includes('halaman 3') && t.includes('suruhan'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.nota3Suruhan;
+    }
+    if (t.includes('kata larangan') || (t.includes('halaman 4') && t.includes('larangan'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.nota4Larangan;
+    }
+    if (t.includes('kata perintah permintaan') || (t.includes('halaman 4') && t.includes('permintaan'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.nota4Permintaan;
+    }
+    if (t.includes('kata silaan') || (t.includes('halaman 4') && t.includes('silaan'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.nota4Silaan;
+    }
+    if (t.includes('kata suruhan') || (t.includes('halaman 4') && t.includes('suruhan'))) {
+      return CIKGU_SYAFIQAH_AUDIOS.nota4Suruhan;
+    }
+    return null;
+  }
+
   // Play an exact recorded audio clip (with audio ducking and speech state notification)
-  public playAudioClip(url: string, onEnd?: () => void): HTMLAudioElement | null {
+  public playAudioClip(url: string, onEnd?: () => void, onErrorFallback?: () => void): HTMLAudioElement | null {
     if (!this.enabled || typeof window === 'undefined') return null;
 
     this.stopSpeech();
@@ -896,18 +987,21 @@ class SoundController {
         this.unduckBGM();
         this.notifySpeechState(false);
         this.currentClipAudio = null;
+        if (onErrorFallback) onErrorFallback();
       };
 
       audio.play().catch(() => {
         this.unduckBGM();
         this.notifySpeechState(false);
         this.currentClipAudio = null;
+        if (onErrorFallback) onErrorFallback();
       });
 
       return audio;
     } catch {
       this.unduckBGM();
       this.notifySpeechState(false);
+      if (onErrorFallback) onErrorFallback();
       return null;
     }
   }
@@ -927,6 +1021,18 @@ class SoundController {
   ) {
     if (!this.enabled || typeof window === 'undefined') return;
 
+    // Check if Cikgu Syafiqah has an authentic human audio recording for this sentence
+    if (persona === 'syafiqah') {
+      const clip = this.getSyafiqahAudioForText(text);
+      if (clip) {
+        this.playAudioClip(clip, onEnd, () => {
+          // If audio file is missing or unplayable, fallback to TTS
+          this.executeTTS(text, 'syafiqah', onEnd);
+        });
+        return;
+      }
+    }
+
     // Check if Cikgu Freshcy has an authentic human audio recording for this sentence
     if (persona === 'freshcy') {
       const clip = this.getFreshcyAudioForText(text);
@@ -935,6 +1041,15 @@ class SoundController {
         return;
       }
     }
+
+    this.executeTTS(text, persona, onEnd);
+  }
+
+  private executeTTS(
+    text: string,
+    persona: 'syafiqah' | 'aaron' | 'freshcy' | 'neutral' = 'syafiqah',
+    onEnd?: () => void
+  ) {
 
     if (!('speechSynthesis' in window)) return;
     try {

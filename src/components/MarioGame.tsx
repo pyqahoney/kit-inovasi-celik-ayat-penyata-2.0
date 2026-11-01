@@ -1200,7 +1200,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                           </div>
                           <span className="text-3xl relative z-0">👸🏼</span>
                           <span className="text-[9px] font-heading font-black text-rose-300 bg-black/60 px-1 rounded mt-1">
-                            Princess Peach
+                            Puteri Peach
                           </span>
                         </>
                       ) : (
@@ -1428,7 +1428,7 @@ export const MarioGame: React.FC<MarioGameProps> = ({
                   ?
                 </span>
                 <span className="font-heading font-black text-base text-amber-950">
-                  Cabaran Soalan {activeQuestion.id} (Level {currentLevel})
+                  Cabaran Soalan {activeQuestion.id} (Tahap {currentLevel})
                 </span>
               </div>
               <span className="text-xs font-bold text-amber-800 bg-amber-200 px-2.5 py-0.5 rounded-full uppercase">

@@ -1146,7 +1146,6 @@ export default function App() {
             </div>
 
             <TopNavBar
-              onHome={() => setCurrentScreen('home')}
               soundEnabled={soundEnabled}
               onToggleSound={handleToggleSound}
               onHelp={() => setCurrentScreen('symbols')}
